@@ -1,0 +1,252 @@
+﻿<Window x:Class="self_studyhub.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:materialDesignControls="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+mc:Ignorable="d"
+
+        Title="Study Hub"
+        Height="650"
+        Width="1100"
+        Background="#181818">
+
+
+
+    <!-- ================= RESOURCES ================= -->
+    <Window.Resources>
+
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <!-- Active background -->
+        <SolidColorBrush x:Key="MenuActiveBackground" Color="#2A2A2A"/>
+
+        <!-- Sidebar Button Style -->
+        <Style x:Key="SidebarButtonStyle"
+       TargetType="Button"
+       BasedOn="{StaticResource MaterialDesignFlatButton}">
+
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <!-- 🔥 KEY -->
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="TextElement.Foreground" Value="#B0B0B0"/>
+
+            <Style.Triggers>
+                <!-- Hover -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="TextElement.Foreground" Value="White"/>
+                </Trigger>
+
+                <!-- Pressed -->
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background"
+                    Value="{StaticResource MenuActiveBackground}"/>
+                    <Setter Property="TextElement.Foreground"
+                    Value="{DynamicResource PrimaryHueMidBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
+    </Window.Resources>
+
+    <!-- ================= LAYOUT ================= -->
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ================= SIDEBAR WITH SHADOW ================= -->
+        <Border Grid.Column="0"
+        Background="#202020"
+        CornerRadius="0,8,8,0">
+
+            <Border.Effect>
+                <DropShadowEffect
+            Color="Black"
+            BlurRadius="30"
+            ShadowDepth="4"
+            Opacity="0.30"/>
+            </Border.Effect>
+
+
+            <StackPanel x:Name="Sidebar"
+                Width="45"
+                Background="#202020">
+
+                <!-- Toggle -->
+                <ToggleButton x:Name="ToggleSidebar"  HorizontalAlignment="Left"
+                      Style="{StaticResource MaterialDesignFlatButton}"
+                      Content="☰"
+                      FontSize="18"
+                      Width="50"
+                      Height="50"
+                      Margin="5"/>
+
+                <!-- HOME -->
+                <Button Style="{StaticResource SidebarButtonStyle}"
+                        Click="HomeButton_Click" >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Home"
+                                                 Width="24"
+                                                 Height="24"  
+                                                 Foreground="{Binding Foreground,
+                                                 RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Home"
+                                   Margin="16,0,0,0"
+                                   Visibility="{Binding IsChecked,
+                                   ElementName=ToggleSidebar,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- YOUTUBE -->
+                <Button Style="{StaticResource SidebarButtonStyle}"
+                        Click="YouTubeButton_Click" >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Youtube"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Foreground="{Binding Foreground,
+                                                 RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="YouTube"
+                                   Margin="16,0,0,0"
+                                   Visibility="{Binding IsChecked,
+                                   ElementName=ToggleSidebar,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- BROWSER -->
+                <Button Style="{StaticResource SidebarButtonStyle}"
+                        Click="BrowserButton_Click" >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="OpenInBrowser"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Foreground="{Binding Foreground,
+                                                 RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Browser"
+                                   Margin="16,0,0,0"
+                                   Visibility="{Binding IsChecked,
+                                   ElementName=ToggleSidebar,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- PDF -->
+                <Button Style="{StaticResource SidebarButtonStyle}"
+                        Click="PDFButton_Click"  >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FilePdfBox"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Foreground="{Binding Foreground,
+                                                 RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="PDF File"
+                                   Margin="16,0,0,0"
+                                   Visibility="{Binding IsChecked,
+                                   ElementName=ToggleSidebar,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- NOTE -->
+                <Button Style="{StaticResource SidebarButtonStyle}"
+                        Click="NoteButton_Click" >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Note"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Foreground="{Binding Foreground,
+                                                 RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Note"
+                                   Margin="16,0,0,0"
+                                   Visibility="{Binding IsChecked,
+                                   ElementName=ToggleSidebar,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- SETTINGS -->
+                <Button Style="{StaticResource SidebarButtonStyle}"
+                        Height="45"
+                        Click="NavButton_Click" >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Settings"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Foreground="{Binding Foreground,
+                                                 RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Settings"
+                                   Margin="16,0,0,0"
+                                   Visibility="{Binding IsChecked,
+                                   ElementName=ToggleSidebar,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <Grid Grid.Column="1" Background="#121212">
+
+            
+
+            <ContentControl x:Name="MainContent" Margin="20">
+                <materialDesign:Card Padding="20" Background="#1E1E1E">
+                    <StackPanel>
+                        <TextBlock Text="Welcome to Study Hub"
+                                   Foreground="White"
+                                   FontSize="24"
+                                   FontWeight="Bold"/>
+                        <TextBlock Text="Select an option from the sidebar."
+                                   Foreground="Gray"
+                                   Margin="0,10,0,0"/>
+                    </StackPanel>
+                </materialDesign:Card>
+            </ContentControl>
+
+        </Grid>
+    </Grid>
+
+    <!-- ================= SIDEBAR ANIMATION ================= -->
+    <Window.Triggers>
+
+        <EventTrigger RoutedEvent="ToggleButton.Checked"
+                      SourceName="ToggleSidebar">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Sidebar"
+                                     Storyboard.TargetProperty="Width"
+                                     To="200"
+                                     Duration="0:0:0.3"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+        <EventTrigger RoutedEvent="ToggleButton.Unchecked"
+                      SourceName="ToggleSidebar">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Sidebar"
+                                     Storyboard.TargetProperty="Width"
+                                     To="60"
+                                     Duration="0:0:0.3"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+    </Window.Triggers>
+
+</Window>

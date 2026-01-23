@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="self_studyhub.Pages.BrowserPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             Background="#121212">
+
+    <Grid>
+
+        <!-- FIRST SCREEN : CUSTOM SEARCH UI -->
+        <StackPanel x:Name="SearchPanel"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Width="600">
+
+            <!-- Logo / Title -->
+            <TextBlock Text="MyBrowser"
+                       FontSize="48"
+                       FontWeight="SemiBold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,30"/>
+
+            <!-- Search Bar -->
+            <Border Height="48"
+                    CornerRadius="24"
+                    Background="#2A2A2A"
+                    Padding="15,0">
+
+                <TextBox x:Name="SearchBox"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Foreground="White"
+                         FontSize="16"
+                         VerticalContentAlignment="Center"
+                         KeyDown="SearchBox_KeyDown"
+                         Text="Search Google or type a URL"/>
+            </Border>
+        </StackPanel>
+
+        <!-- WEB BROWSER -->
+        <wv2:WebView2 x:Name="MyBrowser"
+                      Visibility="Collapsed"/>
+    </Grid>
+</UserControl>
