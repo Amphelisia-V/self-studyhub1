@@ -57,6 +57,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -77,6 +79,12 @@
     </ApplicationDefinition>
     <Compile Include="BrowserPage.xaml.cs">
       <DependentUpon>BrowserPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="note.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="note.Designer.cs">
+      <DependentUpon>note.cs</DependentUpon>
     </Compile>
     <Compile Include="Note.xaml.cs">
       <DependentUpon>Note.xaml</DependentUpon>
@@ -137,6 +145,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="note.resx">
+      <DependentUpon>note.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
