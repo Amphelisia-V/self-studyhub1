@@ -45,7 +45,7 @@ namespace self_studyhub.Pages
         }
         
 
-        private async void LoadVideo_Click(object sender, RoutedEventArgs e)
+        private  void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
            if(VideoView != null && VideoView.CoreWebView2 !=null)
             {
@@ -65,6 +65,18 @@ namespace self_studyhub.Pages
             {
                 MessageBox.Show("please wait a second");
             }
+        }
+
+        private void SaveNote_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(NoteBox.Text))
+            {
+                MessageBox.Show("Note is empty!");
+                return;
+            }
+
+            // Temporary save (later DB / File save လုပ်နိုင်)
+            MessageBox.Show("Note Saved:\n\n" + NoteBox.Text);
         }
     }
 

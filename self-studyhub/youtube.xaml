@@ -70,7 +70,7 @@ Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
-                
+               
             </Grid.ColumnDefinitions>
             <wv2:WebView2 x:Name="VideoView"
                           Grid.Column="0"
@@ -84,11 +84,61 @@ Margin="10">
                           Background="Gray">
 
             </GridSplitter>
+            <!--note+ task-->
+            <Border Grid.Column="1">
+                <StackPanel Margin="10">
 
-            <StackPanel Grid.Column="1" Margin="10">
-                <TextBlock Text="My Notes" FontSize="16" FontWeight="Bold"/>
-                <TextBox Height="200" AcceptsReturn="True"/>
-            </StackPanel>
+                    <!-- ================= TODAY TASK ================= -->
+                    
+
+                    
+                    <!-- ================= NOTES ================= -->
+                    <TextBlock Text="My Notes"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   Margin="0,0,0,8"/>
+
+                    <TextBox x:Name="NoteBox"
+                 Height="180"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 Foreground="White"
+                 Background="#1E1E1E"
+                 materialDesign:HintAssist.Hint="Write your note here"
+                 Margin="0,0,0,8"/>
+
+                    <Button Content="Save Note"
+                Width="100"
+                HorizontalAlignment="Right"
+                Click="SaveNote_Click"/>
+                    <!-- Divider -->
+                    <Separator Margin="0,12,0,12"/>
+
+                    <!-- Task List with Checkbox -->
+                    <ListBox x:Name="TaskList"
+         Height="140"
+         Background="#1E1E1E"
+         BorderThickness="0">
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding}"
+                      Foreground="White"
+                      FontSize="14"
+                      Margin="4"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>
+
+
+                </StackPanel>
+            </Border>
+
+
+
         </Grid>
 
     </Grid>

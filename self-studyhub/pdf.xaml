@@ -3,10 +3,63 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="#121212">
     <Grid>
-        <TextBlock Text="PDF Page"
-                   FontSize="26"
-                   Foreground="Gray"
+        <Grid.RowDefinitions>
+
+            <RowDefinition Height="Auto"></RowDefinition>
+            <!--header-->
+            <RowDefinition Height="*"></RowDefinition>
+            <!--logo-->
+            <RowDefinition Height="Auto"></RowDefinition>
+            <!--search-->
+            <RowDefinition Height="Auto"></RowDefinition>
+            <!--button-->
+            <RowDefinition Height="Auto"></RowDefinition>
+            <!--footer-->
+        </Grid.RowDefinitions>
+        <!--Header-->
+        <Grid Grid.Row="0" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="40"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="40"></ColumnDefinition>
+                <ColumnDefinition Width="40"></ColumnDefinition>
+
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0"
+                        Text="Google"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   Foreground="White"
                    HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+                      
+                  ></TextBlock>
+            <!--<TextBlock Grid.Column="1"
+                       Text="🔍"
+                       FontSize="18"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="White"></TextBlock>-->
+            <Border Grid.Column="2"
+                Height="48"
+                    CornerRadius="24"
+                    Background="#2A2A2A"
+                    Padding="15,0">
+                <TextBox 
+                x:Name="SearchBox"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Foreground="White"
+                         FontSize="16"
+                         VerticalContentAlignment="Center"
+                        
+                         Text="Search Google or type a URL"/>
+            </Border>
+
+        </Grid>
+        <!--Logo-->
+
+
+
     </Grid>
 </UserControl>

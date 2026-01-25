@@ -84,7 +84,7 @@ mc:Ignorable="d"
                 Background="#202020">
 
                 <!-- Toggle -->
-                <ToggleButton x:Name="ToggleSidebar"  HorizontalAlignment="Left"
+                <ToggleButton x:Name="ToggleSidebar"  HorizontalAlignment="Center"
                       Style="{StaticResource MaterialDesignFlatButton}"
                       Content="☰"
                       FontSize="18"
