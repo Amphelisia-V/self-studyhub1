@@ -35,9 +35,18 @@ namespace self_studyhub.Pages
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string keyword = SearchBox.Text.ToLower();
-            
-            // နောက်ပိုင်း DB / List filter လုပ်လို့ရ
+
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                TaskListPanel.ItemsSource = tasks;
+                return;
+            }
+
+            TaskListPanel.ItemsSource = tasks
+                .Where(t => t.ToLower().Contains(keyword))
+                .ToList();
         }
+
         private void AddNewTask_Click(object sender, RoutedEventArgs e)
         {
             // Create a new TextBox for input
@@ -73,7 +82,12 @@ namespace self_studyhub.Pages
                 if (args.Key == Key.Enter && !string.IsNullOrWhiteSpace(newTaskBox.Text) && newTaskBox.Text != "Enter new task")
                 {
                     tasks.Add(newTaskBox.Text);
-                    TaskListPanel.Items.Remove(newTaskBox);
+                    if (args.Key == Key.Enter &&
+    !string.IsNullOrWhiteSpace(newTaskBox.Text) &&
+    newTaskBox.Text != "Enter new task")
+                    {
+                        tasks.Add(newTaskBox.Text);
+                    }
                 }
             };
 
