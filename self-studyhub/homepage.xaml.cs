@@ -80,7 +80,7 @@ namespace self_studyhub.Pages
             // Add TextBox temporarily
             TaskListPanel.Items.Add(newTaskBox);
             newTaskBox.Focus();
-        }
+        } 
     }
     }
 
