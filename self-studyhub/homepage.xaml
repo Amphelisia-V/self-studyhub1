@@ -42,7 +42,7 @@
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="🔥" FontSize="16" Margin="0,0,5,0" Foreground="Red"/>
                             <!-- Fire emoji for streak -->
-                            <TextBlock Text="5 Days" Foreground="White"/>
+                            <TextBlock Text="4 Days" Foreground="White"/>
                         </StackPanel>
                     </Border>
                     <Button Content="🔔" FontSize="18" Foreground="Yellow" HorizontalAlignment="Center" Background="Transparent"
