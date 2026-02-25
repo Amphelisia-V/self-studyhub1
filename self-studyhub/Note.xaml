@@ -26,8 +26,8 @@
             </Border>
 
             <Button Grid.Column="1"
-                    Content="+ New Note"
-                    Height="40"
+                    Content="+ New Note" Click="NewNote_Click" 
+                Height="40"
                     Padding="25,0"
                     Margin="10,0,0,0"
                     Foreground="White"
@@ -92,5 +92,72 @@
 
             </UniformGrid>
         </ScrollViewer>
+
+
+        <!-- Slide Editor Overlay -->
+        <Grid x:Name="EditorOverlay"
+      Background="#80000000"
+      Visibility="Collapsed">
+
+            <Grid HorizontalAlignment="Right" Width="600">
+                <Grid.RenderTransform>
+                    <TranslateTransform x:Name="EditorTransform" X="600"/>
+                </Grid.RenderTransform>
+
+                <Border Background="White"
+                CornerRadius="25,0,0,25"
+                Padding="25">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Toolbar -->
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="B" Width="35"/>
+                                <Button Content="I" Width="35" Margin="5,0"/>
+                                <Button Content="•" Width="35"/>
+                            </StackPanel>
+
+                            <Button Content="Save"
+                            DockPanel.Dock="Right"
+                            Background="#2563EB"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Width="80"
+                            Height="35"/>
+                        </DockPanel>
+
+                        <!-- Title -->
+                        <TextBox x:Name="NoteTitleBox"
+                         Grid.Row="1"
+                         FontSize="20"
+                         FontWeight="Bold"
+                         Margin="0,20,0,10"
+                         Text="Untitled Note"/>
+
+                        <!-- Content -->
+                        <TextBox x:Name="NoteContentBox"
+                         Grid.Row="2"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         TextWrapping="Wrap"
+                         FontSize="14"/>
+
+                        <!-- Close Button -->
+                        <Button Grid.Row="3"
+                        Content="Close"
+                        HorizontalAlignment="Right"
+                        Margin="0,15,0,0"
+                        Click="CloseEditor_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
     </Grid>
-    </UserControl>
+</UserControl>
