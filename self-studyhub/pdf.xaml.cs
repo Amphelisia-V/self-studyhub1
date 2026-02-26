@@ -25,5 +25,6 @@ namespace self_studyhub.Pages
         {
             InitializeComponent();
         }
+        
     }
 }
