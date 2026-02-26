@@ -29,20 +29,18 @@ namespace self_studyhub.Pages
         public HomePage()
         {
             InitializeComponent();
-            UpdateProgress(39);
+            DrawCircleProgress(0.6);
+            UpdateDailyGoal(3, 15);
+            Loaded += HomePage_Loaded;
+
+
             timeLeft = TimeSpan.FromMinutes(25);
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += Timer_Tick;// Example
         }
-        private void UpdateProgress(double percent)
-        {
-            double maxWidth = 300;
-            ProgressFill.Width = (percent / 100) * maxWidth;
-            ProgressTitle.Text = $"{percent}% to complete";
-        }
-
+        
         private void OpenTaskModal(object sender, RoutedEventArgs e)
         {
             TaskModalOverlay.Visibility = Visibility.Visible;
@@ -108,6 +106,63 @@ namespace self_studyhub.Pages
             timer.Stop();
             timeLeft = TimeSpan.FromMinutes(25);
             TimerText.Text = timeLeft.ToString(@"mm\:ss");
+            StartButton.Content = "START";
+            isRunning = false;
+        }
+        private void Task_Checked(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Task Completed!");
+        }
+
+        private void Task_Unchecked(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Task Unchecked!");
+        }
+        private void DrawCircleProgress(double percentage)
+        {
+            double angle = percentage * 360;
+            double radius = 70;
+            Point center = new Point(80, 80);
+
+            double radians = (Math.PI / 180) * (angle - 90);
+            double x = center.X + radius * Math.Cos(radians);
+            double y = center.Y + radius * Math.Sin(radians);
+
+            bool isLargeArc = angle > 180;
+
+            PathFigure figure = new PathFigure();
+            figure.StartPoint = new Point(center.X, center.Y - radius);
+
+            ArcSegment arc = new ArcSegment();
+            arc.Point = new Point(x, y);
+            arc.Size = new Size(radius, radius);
+            arc.IsLargeArc = isLargeArc;
+            arc.SweepDirection = SweepDirection.Clockwise;
+
+            figure.Segments.Add(arc);
+
+            PathGeometry geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+
+            ProgressArc.Data = geometry;
+        }
+        private void UpdateDailyGoal(int completed, int total)
+        {
+            double percentage = (double)completed / total;
+
+            // Bar width change
+            DailyGoalBar.Width = percentage * 300; // 300 = progress bar container width
+
+            // Text change
+            DailyGoalText.Text = $"{completed}/{total} tasks completed";
+
+            int left = total - completed;
+            DailyGoalInfo.Text = $"{left} tasks left to complete today's goal";
+            DailyGoalBar.Width = percentage * ((Grid)DailyGoalBar.Parent).ActualWidth;
+        }
+        private void HomePage_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateDailyGoal(3, 15);
         }
     }
     }
