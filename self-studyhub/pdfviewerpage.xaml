@@ -3,32 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:self_studyhub.Pages"
              xmlns:syncfusion="clr-namespace:Syncfusion.Windows.PdfViewer;assembly=Syncfusion.PdfViewer.WPF"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="1000"
+             Background="#1E1E1E">
+
     <Grid>
-        <!-- Top Toolbar -->
-        <TextBlock x:Name="PdfPathText"
-           Foreground="White"
-           FontSize="18"
-           HorizontalAlignment="Center"
-           VerticalAlignment="Center"/>
-        <StackPanel Orientation="Horizontal" Background="#2D2D30" Height="50" VerticalAlignment="Top">
-            <Button Content="Open PDF" Width="100" Margin="5" />
-            <Button Content="Highlight" Width="100" Margin="5" />
-            <Button Content="Add Note" Width="100" Margin="5" />
-            <Button Content="Save" Width="100" Margin="5" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 🔹 Top Toolbar -->
+        <StackPanel Orientation="Horizontal" Background="#2D2D30" Grid.Row="0">
+            <Button Content="Open PDF" Width="100" Margin="5" Click="OpenPdf_Click"/>
+            <Button Content="Highlight" Width="100" Margin="5" Click="Highlight_Click"/>
+            <Button Content="Add Note" Width="100" Margin="5" Click="AddNote_Click"/>
+            <Button Content="Save" Width="100" Margin="5,9,5,0" Click="Save_Click" VerticalAlignment="Top"/>
         </StackPanel>
 
-        <!-- Main Layout -->
-        <Grid Margin="0,50,0,0">
+        <!-- 🔹 Main Layout -->
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="130*"/>
+                <ColumnDefinition Width="34*"/>
+                <ColumnDefinition Width="83*"/>
+                <ColumnDefinition Width="503*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left Sidebar -->
+            <!-- Sidebar -->
             <TabControl Grid.Column="0" Background="#252526" Foreground="White">
                 <TabItem Header="Thumbnails">
                     <ListBox x:Name="ThumbnailList" Background="#252526" Foreground="White"/>
@@ -39,7 +43,9 @@
             </TabControl>
 
             <!-- PDF Viewer -->
-            <syncfusion:PdfViewerControl x:Name="pdfViewer" Grid.Column="1" Background="White"/>
+            <syncfusion:PdfViewerControl x:Name="pdfViewer"
+                                         Grid.Column="1"
+                                         Background="White" Grid.ColumnSpan="4"/>
         </Grid>
     </Grid>
 </UserControl>

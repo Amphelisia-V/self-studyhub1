@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.IO;
+using Syncfusion.Windows.PdfViewer;
 
 namespace self_studyhub.Pages
 {
@@ -20,10 +23,46 @@ namespace self_studyhub.Pages
     /// </summary>
     public partial class pdfviewerpage : UserControl
     {
+        string currentFilePath = "";
         public pdfviewerpage(string filePath)
         {
             InitializeComponent();
-            PdfPathText.Text = "Loaded PDF:\n" + filePath;
+            currentFilePath = filePath;
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                pdfViewer.Load(filePath);
+            }
+        }
+
+        private void OpenPdf_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "PDF Files (*.pdf)|*.pdf";
+
+            if (dialog.ShowDialog() == true)
+            {
+                currentFilePath = dialog.FileName;
+                pdfViewer.Load(currentFilePath);
+            }
+        }
+
+        private void Highlight_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Highlight feature depends on Syncfusion full annotation package.");
+        }
+
+        private void AddNote_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sticky note feature requires annotation-enabled version.");
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(currentFilePath))
+            {
+                pdfViewer.Save(currentFilePath);
+                MessageBox.Show("Saved Successfully!");
+            }
         }
     }
 }
