@@ -60,30 +60,33 @@
                        Margin="60,0,0,20"/>
 
             <!-- Open PDF -->
-            <Button Content="Open PDF"
-                    Height="60"
-                    Background="#2D2D30"
-                    Foreground="White"
-                    BorderBrush="#3E3E42"
-                    Margin="60,0,0,5"
-                    />
+            <Button x:Name="OpenPDFButton"
+        Content="Open PDF"
+        Height="60"
+        Background="#2D2D30"
+        Foreground="White"
+        BorderBrush="#3E3E42"
+        Margin="60,0,0,5"
+        />
 
-            <!-- Open Folder -->
-            <Button Content="Continue Last Session"
-                    Height="60"
-                    Background="#2D2D30"
-                    Foreground="White"
-                    BorderBrush="#3E3E42"
-                    Margin="60,0,0,5"/>
+            <Button x:Name="ContinueButton"
+        Content="Continue Last Session"
+        Height="60"
+        Background="#2D2D30"
+        Foreground="White"
+        BorderBrush="#3E3E42"
+        Margin="60,0,0,5"/>
 
-            <!-- Create New -->
-            <Button Content="View My Notes"
-                    Height="60"
-                    Background="#2D2D30"
-                    Foreground="White"
-                    BorderBrush="#3E3E42"
-                    Margin="60,0,0,5"/>
+            <Button x:Name="ViewNotesButton"
+        Content="View My Notes"
+        Height="60"
+        Background="#2D2D30"
+        Foreground="White"
+        BorderBrush="#3E3E42"
+        Margin="60,0,0,5"/>
 
+           
+            
         </StackPanel>
 
     </Grid>
