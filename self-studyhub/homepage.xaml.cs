@@ -15,16 +15,26 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace self_studyhub.Pages
 {
     public partial class HomePage : UserControl
     {
+        private DispatcherTimer timer;
+        private TimeSpan timeLeft;
+        private bool isRunning = false;
+
         public HomePage()
         {
             InitializeComponent();
-            UpdateProgress(39); // Example
+            UpdateProgress(39);
+            timeLeft = TimeSpan.FromMinutes(25);
+
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += Timer_Tick;// Example
         }
         private void UpdateProgress(double percent)
         {
@@ -60,8 +70,49 @@ namespace self_studyhub.Pages
                 TaskList.Items.Remove(TaskList.SelectedItem);
             }
         }
+        
+           
+            private void Timer_Tick(object sender, EventArgs e)
+            {
+                if (timeLeft.TotalSeconds > 0)
+                {
+                    timeLeft = timeLeft.Subtract(TimeSpan.FromSeconds(1));
+                    TimerText.Text = timeLeft.ToString(@"mm\:ss");
+                }
+                else
+                {
+                    timer.Stop();
+                    MessageBox.Show("Time's up!");
+                    StartButton.Content = "START";
+                    isRunning = false;
+                }
+            }
+
+            private void StartTimer(object sender, RoutedEventArgs e)
+            {
+                if (!isRunning)
+                {
+                    timer.Start();
+                    StartButton.Content = "STOP";
+                    isRunning = true;
+                }
+                else
+                {
+                    timer.Stop();
+                    StartButton.Content = "START";
+                    isRunning = false;
+                }
+            }
+        private void ResetTimer(object sender, RoutedEventArgs e)
+        {
+            timer.Stop();
+            timeLeft = TimeSpan.FromMinutes(25);
+            TimerText.Text = timeLeft.ToString(@"mm\:ss");
+        }
     }
-}
+    }
+
+
 
     
 

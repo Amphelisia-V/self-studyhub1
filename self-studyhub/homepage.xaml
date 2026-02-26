@@ -15,6 +15,8 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
+        <!--header-->
+
 
         <!-- ================= DAILY GOAL CARD ================= -->
         <Border Grid.Row="0"
@@ -82,23 +84,62 @@
             </StackPanel>
         </Border>
 
-        <!-- ================= RECENT ================= -->
+        <!-- ================= FOCUS TIMER ================= -->
         <Border Grid.Row="1"
-                Grid.Column="0"
-                Background="#161B22"
-                Margin="30"
-                Padding="20"
-                CornerRadius="15">
-            <StackPanel>
-                <TextBlock Text="Recent"
-                           Foreground="White"
-                           FontSize="16"
-                           Margin="0,0,0,10"/>
-                <TextBlock Text="• Last Completed Task"
-                           Foreground="#9CA3AF"/>
+        Grid.Column="1"
+        Width="350"
+        Height="220"
+        Background="#F3EED9"
+        Margin="10"
+        CornerRadius="20"
+        Padding="25">
+
+            <StackPanel HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+
+                <!-- Title -->
+                <TextBlock Text="Focus Timer"
+                   Foreground="#555"
+                   FontSize="16"
+                   HorizontalAlignment="Center"
+                   Margin="0,5,0,5"/>
+
+                <!-- Big Timer -->
+                <TextBlock x:Name="TimerText"
+                   Text="25:00"
+                   FontSize="40"
+                   FontWeight="Bold"
+                   Foreground="#222"
+                   HorizontalAlignment="Center"/>
+                <!-- Start Button -->
+
+                <Button x:Name="StartButton"
+                Content="START"
+                Width="110"
+                Height="35"
+                FontSize="18"
+                FontWeight="Bold"
+                Background="#FF5A5F"
+                Foreground="White"
+                BorderThickness="0"
+                Click="StartTimer"
+                Cursor="Hand"/>
+
+                <!-- reset Button -->
+                <Button x:Name="ResetButton"
+Content="RESET"
+Width="110"
+Height="35"
+FontSize="18"
+FontWeight="Bold"
+Background="#FF5A5F"
+Foreground="White"
+BorderThickness="0"
+Click="ResetTimer"
+Cursor="Hand"/>
+
             </StackPanel>
         </Border>
-
         <!-- ================= TODAY TASKS ================= -->
         <Border Grid.Row="0"
                 Grid.Column="1"
@@ -189,6 +230,7 @@
 
                 </StackPanel>
             </Border>
+          
         </Grid>
 
     </Grid>
