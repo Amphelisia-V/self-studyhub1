@@ -18,6 +18,8 @@
         <!--header-->
 
 
+
+
         <!-- ================= DAILY GOAL CARD ================= -->
         <Border Grid.Row="0"
                 Grid.Column="0"
