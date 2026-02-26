@@ -3,185 +3,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         >
-    <Grid>
-        <Grid.RowDefinitions>
+    <Grid Height="70" Background="#1E1E1E">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-            <RowDefinition Height="Auto"></RowDefinition>
-            <!--header-->
-            <RowDefinition Height="Auto"></RowDefinition>
-            <!--logo-->
-            <RowDefinition Height="Auto"></RowDefinition>
-            <!--search-->
-            <RowDefinition Height="*"></RowDefinition>
-            <!--button-->
-            <RowDefinition Height="Auto"></RowDefinition>
-            <!--footer-->
-        </Grid.RowDefinitions>
-        
-        <!--Header-->
+        <!-- Left Side Title -->
+        <TextBlock Text="StudyControl"
+               FontSize="26"
+               FontWeight="Bold"
+               Foreground="White"
+               VerticalAlignment="Center"
+               Margin="20,0,0,0"/>
 
+        <!-- Right Side Section -->
+        <StackPanel Grid.Column="1"
+                Orientation="Horizontal"
+                VerticalAlignment="Center"
+                Margin="0,0,20,0">
 
-        <Grid Grid.Row="0" Margin="20">
-            <!-- Header -->
-            <DockPanel Height="60" VerticalAlignment="Top" >
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="left" VerticalAlignment="Center">
-                    <Image Source="D:\4CS\Project\app_logo\logo2.jpg"
-               Width="40"
-               Height="40"
-               Margin="0,0,10,0"/>
-                    <TextBlock Text="StudyControl" FontSize="24" FontWeight="Bold" Foreground="White"  />
+            <!-- Streak Box -->
+            <Border Background="#2A2A2A"
+                CornerRadius="10"
+                Padding="10,5"
+                Margin="0,0,10,0">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🔥"
+                           FontSize="16"
+                           Margin="0,0,5,0"/>
+                    <TextBlock Text="5 Days"
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <!-- Level 
-                    <Border Background="#FF2E2E2E" CornerRadius="5" Padding="5" Height="40" Margin="0,0,10,0">
-                        <TextBlock Text="Level 3"  VerticalAlignment="Top" Foreground="White" Margin="0,17,0,0"/>
-                    </Border>-->
+            </Border>
 
-                    <!-- Study Streak -->
-                    <Border Background="#FF2E2E2E" CornerRadius="5" Padding="5" Margin="0,0,5,0" Height="40">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="🔥" FontSize="16" Margin="0,0,5,0" Foreground="Red"/>
-                            <!-- Fire emoji for streak -->
-                            <TextBlock Text="4 Days" Foreground="White"/>
-                        </StackPanel>
-                    </Border>
-                    <Button Content="🔔" FontSize="18" Foreground="Yellow" HorizontalAlignment="Center" Background="Transparent"
-                      Width="55"
-                      Height="40"
-                      Margin="5"/>
+            <!-- Notification Button -->
+            <Button Width="40"
+                Height="40"
+                Background="#2A2A2A"
+                BorderBrush="#444"
+                BorderThickness="1"
+                Cursor="Hand">
 
-                    
-                </StackPanel>
-            </DockPanel>
-        </Grid>
-        <Border Grid.Row="1" Height="48"
-                    CornerRadius="24"
-                 Width="600"
-                    Background="#2A2A2A"
-                    Padding="15,0" >
+                <TextBlock Text="🔔"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            </Button>
 
-            <TextBox x:Name="SearchBox"
-                     VerticalContentAlignment="Center"
-                     materialDesign:HintAssist.Hint="Search tasks, notes, videos..."
-                     BorderThickness="0"
-                     TextChanged="SearchBox_TextChanged" Foreground="White"/>
-        </Border>
-        
-        <!-- Main Content -->
-            <UniformGrid Columns="4" Grid.Row="2" Margin="0,10,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Top" >
-                   
-                <!-- Tasks Card -->
-            <materialDesign:Card Padding="10" Margin="10"  Background="#2E2E2E" Foreground="White" UniformCornerRadius="22">
-                    <StackPanel>
-                        <DockPanel Height="60" VerticalAlignment="Top">
-                            <TextBlock Text="Today's Tasks" FontSize="18" FontWeight="Bold"/>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                                
-                                <Button Content="+ New Task" Click="AddNewTask_Click"/>
-                            </StackPanel>
-                        </DockPanel>
-
-                        <!-- Tasks List -->
-                        <ItemsControl x:Name="TaskListPanel" Margin="0,10,0,0">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Content="{Binding}" Margin="0,5,0,0"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </materialDesign:Card>
-
-
-
-                <!-- Level Up / Skill Progress Card -->
-                <Border CornerRadius="8"  Margin="10">
-                <materialDesign:Card Padding="15"  Background="#2E2E2E"  UniformCornerRadius="22">
-                        <StackPanel>
-                            <TextBlock Text="Skill Progress" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,5">
-                                <TextBlock Text="Level " FontSize="16" Foreground="#2E2E2E"/>
-                                <TextBlock x:Name="LevelText" Text="Level 3" FontSize="18" FontWeight="Bold" Foreground="#FFD700" />
-                            </StackPanel>
-                            <Grid Margin="0,5">
-                                <ProgressBar x:Name="SkillProgressBar" Minimum="0" Maximum="100" Value="60" Height="25" Foreground="#00BFFF"/>
-                                <TextBlock x:Name="XPText" Text="60 XP / 100 XP" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
-                            </Grid>
-                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                <Border Background="#FF4CAF50" CornerRadius="5" Padding="5" Margin="2">
-                                    <TextBlock Text="C#" Foreground="White" FontWeight="Bold"/>
-                                </Border>
-                                <Border Background="#FF2196F3" CornerRadius="5" Padding="5" Margin="2">
-                                    <TextBlock Text="Java" Foreground="White" FontWeight="Bold"/>
-                                </Border>
-                                <Border Background="#FFFF9800" CornerRadius="5" Padding="5" Margin="2">
-                                    <TextBlock Text="Spring" Foreground="White" FontWeight="Bold"/>
-                                </Border>
-                            </StackPanel>
-                            <TextBlock x:Name="NextLevelText" Text="40 XP to next level" Margin="0,10,0,0" Foreground="#AAAAAA" FontStyle="Italic"/>
-                        </StackPanel>
-                    </materialDesign:Card>
-                </Border>
-
-
-                <!-- Focus Timer Card -->
-
-            <materialDesign:Card Padding="10" Margin="10"  Background="#2E2E2E"  UniformCornerRadius="22">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="Focus Timer" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                            <TextBlock x:Name="TimerText" Text="25:00" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                                <Button Content="Start" Width="65" Margin="5" />
-                                <Button Content="Pause" Width="69" Margin="5" />
-                                <Button Content="Reset" Width="68" Margin="5" />
-                            </StackPanel>
-                        </StackPanel>
-                    </materialDesign:Card>
-               
-                <!-- daily goals -->
-                <Border CornerRadius="8"  Margin="10">
-                <materialDesign:Card Padding="15" Background="#2E2E2E" UniformCornerRadius="22">
-                        <StackPanel>
-                            <!-- Title -->
-                            <TextBlock Text="Daily Goal" FontSize="20" FontWeight="Bold" Foreground="White"/>
-
-                            <!-- Progress -->
-                            <Grid Margin="0,10">
-                                <ProgressBar x:Name="DailyGoalProgressBar" Minimum="0" Maximum="5" Value="3" Height="25" Foreground="#00BFFF"/>
-                                <TextBlock x:Name="DailyGoalText" Text="3/5 tasks completed" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
-                            </Grid>
-
-                            <!-- Next goal info -->
-                            <TextBlock x:Name="DailyGoalNextText" Text="2 tasks left to complete today's goal" Margin="0,10,0,0" Foreground="#AAAAAA" FontStyle="Italic"/>
-                        </StackPanel>
-                    </materialDesign:Card>
-                </Border>
-            <!-- Recent note -->
-            <materialDesign:Card Padding="10"  Margin="10" Background="#2E2E2E" Foreground="White"  UniformCornerRadius="22">
-                    <StackPanel>
-                        <TextBlock Text="Recent Notes" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                        <TextBlock Text="• Java Basics" Margin="0,5,0,0"/>
-                        <TextBlock Text="• Spring Boot Intro" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </materialDesign:Card>
-
-                <!-- Upcoming Events Card -->
-            <materialDesign:Card Padding="10" Margin="10" Background="#2E2E2E" Foreground="White"  UniformCornerRadius="22">
-                    <StackPanel>
-                        <TextBlock Text="Upcoming Events" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                        <TextBlock Text="📅 Meeting at 3 PM" Margin="0,5,0,0"/>
-                        <TextBlock Text="📌 Assignment Due Tomorrow" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </materialDesign:Card>
-
-            </UniformGrid>
-           
-        
-        
-
-
-
+        </StackPanel>
     </Grid>
-
-
 </UserControl>

@@ -58,7 +58,9 @@
 
         <!-- Notes Grid -->
         <ScrollViewer Grid.Row="2">
-            <UniformGrid Columns="3" Margin="-10">
+            <UniformGrid x:Name="NotesContainer"
+            Columns="3"
+            Margin="10">
 
                 <!-- Note Card Template -->
                 <Border Background="White" CornerRadius="18" VerticalAlignment="Top" Margin="10" Padding="15">
@@ -116,22 +118,6 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Toolbar -->
-                        <DockPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="B" Width="35"/>
-                                <Button Content="I" Width="35" Margin="5,0"/>
-                                <Button Content="•" Width="35"/>
-                            </StackPanel>
-
-                            <Button Content="Save"
-                            DockPanel.Dock="Right"
-                            Background="#2563EB"
-                            Foreground="White"
-                            BorderThickness="0"
-                            Width="80"
-                            Height="35"/>
-                        </DockPanel>
 
                         <!-- Title -->
                         <TextBox x:Name="NoteTitleBox"
@@ -152,9 +138,17 @@
                         <!-- Close Button -->
                         <Button Grid.Row="3"
                         Content="Close"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Left"
                         Margin="0,15,0,0"
                         Click="CloseEditor_Click"/>
+
+
+                        <!--save-->
+                        <Button Grid.Row="3"
+                        Content="Save"
+                        HorizontalAlignment="Right"
+                        Margin="0,15,0,0"
+        Click="SaveNote_Click"/>
                     </Grid>
                 </Border>
             </Grid>
