@@ -60,7 +60,7 @@
                        Margin="60,0,0,20"/>
 
             <!-- Open PDF -->
-            <Button Content="Open a PDF file"
+            <Button Content="Open PDF"
                     Height="60"
                     Background="#2D2D30"
                     Foreground="White"
@@ -69,7 +69,7 @@
                     />
 
             <!-- Open Folder -->
-            <Button Content="Open a local folder"
+            <Button Content="Continue Last Session"
                     Height="60"
                     Background="#2D2D30"
                     Foreground="White"
@@ -77,7 +77,7 @@
                     Margin="60,0,0,5"/>
 
             <!-- Create New -->
-            <Button Content="Create new PDF project"
+            <Button Content="View My Notes"
                     Height="60"
                     Background="#2D2D30"
                     Foreground="White"
