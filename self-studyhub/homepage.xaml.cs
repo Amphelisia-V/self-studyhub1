@@ -180,9 +180,9 @@ namespace self_studyhub.Pages
         }
         private void UpdateXP(int currentXP, int maxXP)
         {
+            if (maxXP == 0) return;
+
             double percentage = (double)currentXP / maxXP;
-            DrawCircleProgress(percentage);
-            XpText.Text = $"{currentXP} XP";
         }
         private int _completed = 3;
         private int _total = 15;
