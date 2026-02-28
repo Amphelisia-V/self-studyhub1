@@ -32,9 +32,10 @@ namespace self_studyhub.Pages
             DrawCircleProgress(0.6);
             UpdateDailyGoal(3, 15);
             Loaded += HomePage_Loaded;
+            TaskListBox.ItemsSource = allTasks;
+        
 
-
-            timeLeft = TimeSpan.FromMinutes(25);
+        timeLeft = TimeSpan.FromMinutes(25);
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
@@ -56,6 +57,9 @@ namespace self_studyhub.Pages
             if (!string.IsNullOrWhiteSpace(TaskNameBox.Text))
             {
                 TaskList.Items.Add(TaskNameBox.Text);
+                _total++;
+                UpdateDailyGoal(_completed, _total);
+
                 TaskNameBox.Clear();
                 TaskModalOverlay.Visibility = Visibility.Collapsed;
             }
@@ -111,11 +115,17 @@ namespace self_studyhub.Pages
         }
         private void Task_Checked(object sender, RoutedEventArgs e)
         {
+            _completed++;
+            UpdateDailyGoal(_completed, _total);
             ShowMessage("Great Job 🎉", "Task Completed!");
         }
 
         private void Task_Unchecked(object sender, RoutedEventArgs e)
         {
+            if (_completed > 0)
+                _completed--;
+
+            UpdateDailyGoal(_completed, _total);
             ShowMessage("Updated", "Task marked incomplete.");
         }
         private void DrawCircleProgress(double percentage)
@@ -148,8 +158,15 @@ namespace self_studyhub.Pages
         }
         private void UpdateDailyGoal(int completed, int total)
         {
-            double percentage = (double)completed / total;
+            if (total == 0)
+            {
+                ProgressScale.ScaleX = 0;
+                DailyGoalText.Text = "0/0 tasks completed";
+                DailyGoalInfo.Text = "No tasks yet";
+                return;
+            }
 
+            double percentage = (double)completed / total;
             ProgressScale.ScaleX = percentage;
 
             DailyGoalText.Text = $"{completed}/{total} tasks completed";
@@ -184,6 +201,24 @@ namespace self_studyhub.Pages
         private void CloseCustomMessage(object sender, RoutedEventArgs e)
         {
             CustomMessage.Visibility = Visibility.Collapsed;
+        }
+        private List<string> allTasks = new List<string>()
+{
+    "Study C#",
+    "Watch tutorial",
+    "Complete assignment",
+    "Practice coding"
+};
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = SearchBox.Text.ToLower();
+
+            var filtered = allTasks
+                .Where(task => task.ToLower().Contains(keyword))
+                .ToList();
+
+            TaskListBox.ItemsSource = filtered;
         }
     }
     }
