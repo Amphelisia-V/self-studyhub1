@@ -4,16 +4,13 @@
 
     <Grid>
 
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#0E1117" Offset="0"/>
-                <GradientStop Color="#111827" Offset="1"/>
-            </LinearGradientBrush>
+            <Grid.Background>
+            <ImageBrush ImageSource="/Assests/background2.jpg"
+                    Stretch="UniformToFill"
+                    Opacity="0.8"/>
         </Grid.Background>
 
-       
-
-        <!-- Columns -->
+            <!-- Columns -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -29,7 +26,8 @@
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <!-- ================= HEADER ================= -->
-        <Grid Grid.Row="0" Margin="30,20,30,0">
+        <Grid Grid.Row="0" Margin="30,10,30,0"
+        HorizontalAlignment="Stretch">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -110,7 +108,10 @@
                    Margin="0,0,0,15"/>
 
                 <!-- Progress Bar Container -->
-                <Grid Height="28">
+                <Grid Height="28"
+                ClipToBounds="True"
+                x:Name="DailyGoalProgressContainer"
+                SizeChanged="DailyGoalProgressContainer_SizeChanged">
 
                     <!-- Background -->
                     <Border Background="#334155"
@@ -120,11 +121,17 @@
                     <Border x:Name="DailyGoalBar"
                     Background="#38BDF8"
                     CornerRadius="8"
-                    Width="120"/>
-
+                    HorizontalAlignment="Stretch"
+                    RenderTransformOrigin="0,0.5">
+                        <Border.RenderTransform>
+                            <ScaleTransform x:Name="ProgressScale"
+                        ScaleX="0"
+                        CenterX="0"/>
+                        </Border.RenderTransform>
+                    </Border>
                     <!-- Center Text -->
                     <TextBlock x:Name="DailyGoalText"
-                       Text="3/15 tasks completed"
+                      
                        Foreground="White"
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center"
@@ -144,63 +151,75 @@
         <!-- ================= FOCUS TIMER ================= -->
         <Border Grid.Row="3"
         Grid.Column="1"
-        Width="350"
-        Height="220"
-        Background="#F3EED9"
-        Margin="10"
-        CornerRadius="20"
-        Padding="25">
+         Background="#1E1E1E"
+        CornerRadius="15"
+        Padding="20"
+        Width="300"
+        Height="200">
+
 
             <StackPanel HorizontalAlignment="Center"
             VerticalAlignment="Center">
 
+
+
+
                 <!-- Title -->
                 <TextBlock Text="Focus Timer"
-                   Foreground="#555"
-                   FontSize="16"
+                   Foreground="AntiqueWhite"
+                   FontSize="20"
                    HorizontalAlignment="Center"
-                   Margin="0,5,0,5"/>
+                 />
 
                 <!-- Big Timer -->
                 <TextBlock x:Name="TimerText"
                    Text="25:00"
-                   FontSize="40"
+                   
+                   FontSize="50"
                    FontWeight="Bold"
-                   Foreground="#222"
-                   HorizontalAlignment="Center"/>
-                <!-- Start Button -->
+                   Foreground="White"
+                   HorizontalAlignment="Center"
+                   TextWrapping="NoWrap"
+                   Width="auto"/>
+
+                <!--time button-->
+                <StackPanel Orientation="Horizontal"
+                   HorizontalAlignment="Center">
+                    <!-- Start Button -->
 
                 <Button x:Name="StartButton"
                 Content="START"
-                Width="110"
+                Width="80"
                 Height="35"
-                FontSize="18"
+                FontSize="12"
                 FontWeight="Bold"
                 Background="#FF5A5F"
                 Foreground="White"
                 BorderThickness="0"
                 Click="StartTimer"
-                Cursor="Hand"/>
+                Cursor="Hand"
+                />
 
                 <!-- reset Button -->
                 <Button x:Name="ResetButton"
 Content="RESET"
-Width="110"
+Width="80"
 Height="35"
-FontSize="18"
+FontSize="12"
 FontWeight="Bold"
 Background="#FF5A5F"
 Foreground="White"
 BorderThickness="0"
 Click="ResetTimer"
-Cursor="Hand"/>
-
+Cursor="Hand"
+/>
+            </StackPanel>
             </StackPanel>
         </Border>
         <!-- ================= SKILL PROGRESS ================= -->
         <Border Grid.Row="3"
         Grid.Column="0"
-        Margin="30,10,15,20"
+        Margin="0,10,0,10"
         Background="#141821"
         CornerRadius="20"
         Padding="25">
@@ -212,16 +231,17 @@ Cursor="Hand"/>
                    FontSize="18"
                    Margin="0,0,0,15"/>
 
-                <Grid Width="160" Height="160">
+                <Grid Width="140" Height="140"
+                ClipToBounds="False">
 
                     <!-- Background Circle -->
                     <Ellipse Stroke="#2A2F3A"
-                     StrokeThickness="12"/>
+                     StrokeThickness="10"/>
 
                     <!-- Progress Arc -->
                     <Path x:Name="ProgressArc"
                   Stroke="#4FC3F7"
-                  StrokeThickness="12"
+                  StrokeThickness="10"
                   StrokeStartLineCap="Round"
                   StrokeEndLineCap="Round"/>
 
@@ -268,8 +288,19 @@ Cursor="Hand"/>
                          Grid.Row="1"
                          Background="#1C1F2B"
                          BorderThickness="0"
-                         Foreground="White"/>
-
+                         Foreground="White">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding}"
+                      FontSize="14"
+                      Margin="5"
+                      Cursor="Hand"
+                      Foreground="White"
+                      Checked="Task_Checked"
+                      Unchecked="Task_Unchecked"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Button Content="+"
                         Width="30"
                         Height="30"
@@ -287,6 +318,7 @@ Cursor="Hand"/>
 
         <!-- ================= MODAL OVERLAY ================= -->
         <Grid x:Name="TaskModalOverlay"
+        MouseDown="CloseTaskModal"
               Grid.RowSpan="4"
               Grid.ColumnSpan="2"
               Background="#80000000"
@@ -340,6 +372,46 @@ Cursor="Hand"/>
             </Border>
           
         </Grid>
+        <Grid x:Name="CustomMessage"
+        Grid.RowSpan="4"
+        Grid.ColumnSpan="2"
+      Visibility="Collapsed"
+      Background="#80000000"
+      Panel.ZIndex="1000">
 
+            <Border Width="300"
+            Background="#1C1F2B"
+            CornerRadius="15"
+            Padding="20"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+
+                <StackPanel HorizontalAlignment="Center">
+
+                    <TextBlock x:Name="MessageTitle"
+                       Text="Success!"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="#4ADE80"
+                       Margin="0,0,0,10"
+                       HorizontalAlignment="Center"/>
+
+                    <TextBlock x:Name="MessageText"
+                       Text="Task Completed!"
+                       Foreground="White"
+                       TextAlignment="Center"
+                       Margin="0,0,0,15"/>
+
+                    <Button Content="OK"
+                    Width="80"
+                    Background="#7C3AED"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="CloseCustomMessage"/>
+                </StackPanel>
+
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

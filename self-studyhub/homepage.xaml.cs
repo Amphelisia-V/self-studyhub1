@@ -111,18 +111,18 @@ namespace self_studyhub.Pages
         }
         private void Task_Checked(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Task Completed!");
+            ShowMessage("Great Job 🎉", "Task Completed!");
         }
 
         private void Task_Unchecked(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Task Unchecked!");
+            ShowMessage("Updated", "Task marked incomplete.");
         }
         private void DrawCircleProgress(double percentage)
         {
             double angle = percentage * 360;
-            double radius = 70;
-            Point center = new Point(80, 80);
+            double radius = 60;
+            Point center = new Point(70, 70);
 
             double radians = (Math.PI / 180) * (angle - 90);
             double x = center.X + radius * Math.Cos(radians);
@@ -150,19 +150,40 @@ namespace self_studyhub.Pages
         {
             double percentage = (double)completed / total;
 
-            // Bar width change
-            DailyGoalBar.Width = percentage * 300; // 300 = progress bar container width
+            ProgressScale.ScaleX = percentage;
 
-            // Text change
             DailyGoalText.Text = $"{completed}/{total} tasks completed";
 
             int left = total - completed;
             DailyGoalInfo.Text = $"{left} tasks left to complete today's goal";
-            DailyGoalBar.Width = percentage * ((Grid)DailyGoalBar.Parent).ActualWidth;
         }
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateDailyGoal(3, 15);
+        }
+        private void UpdateXP(int currentXP, int maxXP)
+        {
+            double percentage = (double)currentXP / maxXP;
+            DrawCircleProgress(percentage);
+            XpText.Text = $"{currentXP} XP";
+        }
+        private int _completed = 3;
+        private int _total = 15;
+
+        private void DailyGoalProgressContainer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateDailyGoal(_completed, _total);
+        }
+        private void ShowMessage(string title, string message)
+        {
+            MessageTitle.Text = title;
+            MessageText.Text = message;
+            CustomMessage.Visibility = Visibility.Visible;
+        }
+
+        private void CloseCustomMessage(object sender, RoutedEventArgs e)
+        {
+            CustomMessage.Visibility = Visibility.Collapsed;
         }
     }
     }
