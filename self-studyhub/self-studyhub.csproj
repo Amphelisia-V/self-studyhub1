@@ -80,6 +80,9 @@
     <Compile Include="BrowserPage.xaml.cs">
       <DependentUpon>BrowserPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="note.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -100,6 +103,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="homepage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -191,6 +198,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assests\background3.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assests\login.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MaterialDesignThemes.5.3.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.5.3.0\build\MaterialDesignThemes.targets')" />
