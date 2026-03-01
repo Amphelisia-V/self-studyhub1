@@ -61,12 +61,7 @@
             </StackPanel>
         </Grid>
         <!-- ================= SEARCH ================= -->
-        <TextBox x:Name="SearchBox"
-         Width="300"
-         Height="35"
-         TextChanged="SearchBox_TextChanged"/>
-        <ListBox x:Name="TaskListBox">
-        </ListBox>
+        
         <Border Grid.Row="1" Grid.ColumnSpan="2"
         Margin="30,10,0,0"
         Width="500"
