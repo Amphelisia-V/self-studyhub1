@@ -6,16 +6,30 @@
 
              Background="#121212">
     <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="388*"/>
+            <ColumnDefinition Width="277*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        <Grid Grid.Row="0">
+            <TextBlock Text="StudyControl"
+               FontSize="26"
+               FontWeight="Bold"
+               Foreground="White"
+               VerticalAlignment="Center"
+               Margin="20,0,0,0"/>
+            
+        </Grid>
         <!-- Top Search & Action Bar -->
-        <Grid Grid.Row="0" Margin="0,0,0,20">
+        <Grid Grid.Row="1" Margin="0,0,0,20" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="139*"/>
+                <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
@@ -23,7 +37,7 @@
                 Height="48"
                     CornerRadius="24"
                     Background="#2A2A2A"
-                    Padding="15,0">
+                    Padding="15,0" Grid.ColumnSpan="2">
                 <StackPanel Orientation="Horizontal"
 Margin="10">
                     <TextBox 
@@ -36,11 +50,11 @@ Margin="10">
 
                 </StackPanel>
             </Border>
-            <Button Grid.Column="1"
+            <Button Grid.Column="2"
                     Content="+ New Note" Click="NewNote_Click" 
                 Height="40"
                     Padding="25,0"
-                    Margin="10,0,0,0"
+                    Margin="10,4,0,4"
                     Foreground="White"
                     FontWeight="SemiBold"
                     BorderThickness="0"
@@ -55,7 +69,7 @@ Margin="10">
         </Grid>
 
         <!-- Filter Row -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20" Grid.ColumnSpan="2">
             <Border BorderBrush="#4F7DF3" BorderThickness="1.5" CornerRadius="10" Padding="15,6" Margin="0,0,10,0">
                 <TextBlock Text="All Notes" Foreground="#4F7DF3" FontWeight="SemiBold"/>
             </Border>
@@ -68,7 +82,7 @@ Margin="10">
         </StackPanel>
 
         <!-- Notes Grid -->
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2">
             <UniformGrid x:Name="NotesContainer"
             Columns="3"
             Margin="10">
@@ -110,7 +124,7 @@ Margin="10">
         <!-- Slide Editor Overlay -->
         <Grid x:Name="EditorOverlay"
       Background="#80000000"
-      Visibility="Collapsed">
+      Visibility="Collapsed" Grid.ColumnSpan="2" Margin="0,0,0,68" Grid.RowSpan="2">
 
             <Grid HorizontalAlignment="Right" Width="600">
                 <Grid.RenderTransform>
