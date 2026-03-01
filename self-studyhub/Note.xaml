@@ -1,6 +1,9 @@
 ﻿<UserControl x:Class="self_studyhub.Pages.NotePage"
          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:materialDesignControls="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+
              Background="#121212">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -16,15 +19,23 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Border CornerRadius="10" BorderBrush="#DDD" BorderThickness="1" Background="#FFFFFF">
-                <TextBox Height="40"
-                         Width="320"
-                         Padding="10"
-                         Text="Search"
-                         Background="Transparent"
-                         BorderThickness="0"/>
-            </Border>
+            <Border 
+                Height="48"
+                    CornerRadius="24"
+                    Background="#2A2A2A"
+                    Padding="15,0">
+                <StackPanel Orientation="Horizontal"
+Margin="10">
+                    <TextBox 
+         materialDesign:HintAssist.Hint="Paste YouTube link"
+         Background="Transparent"
+         BorderThickness="0"
+         Foreground="White"
+         FontSize="16"
+         VerticalContentAlignment="Center"/>
 
+                </StackPanel>
+            </Border>
             <Button Grid.Column="1"
                     Content="+ New Note" Click="NewNote_Click" 
                 Height="40"
