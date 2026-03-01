@@ -13,23 +13,40 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <TextBlock Text="StudyControl"
-               FontSize="26"
-               FontWeight="Bold"
-               Foreground="White"
-               VerticalAlignment="Center"
-               Margin="20,0,0,0"/>
-            
+        <Grid Grid.Row="0" Margin="0,10,30,10" Grid.ColumnSpan="2"
+        >
+
+
+
+            <DockPanel Height="60" VerticalAlignment="Top" >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="left" VerticalAlignment="Center">
+                    <Image Source="D:\4CS\Project\app_logo\logo2.jpg"
+               Width="40"
+               Height="40"
+               Margin="0,0,10,0"/>
+                    <TextBlock Text="StudyControl" FontSize="24" FontWeight="Bold" Foreground="White"  />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- Level 
+                    <Border Background="#FF2E2E2E" CornerRadius="5" Padding="5" Height="40" Margin="0,0,10,0">
+                        <TextBlock Text="Level 3"  VerticalAlignment="Top" Foreground="White" Margin="0,17,0,0"/>
+                    </Border>-->
+
+                    <!-- Study Streak -->
+                   
+
+
+                </StackPanel>
+            </DockPanel>
         </Grid>
         <!-- Top Search & Action Bar -->
-        <Grid Grid.Row="1" Margin="0,0,0,20" Grid.ColumnSpan="2">
+        <Grid Grid.Row="1" Margin="200,0,200,20" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="139*"/>
-                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="20*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
@@ -41,7 +58,7 @@
                 <StackPanel Orientation="Horizontal"
 Margin="10">
                     <TextBox 
-         materialDesign:HintAssist.Hint="Paste YouTube link"
+         materialDesign:HintAssist.Hint="Search your notes"
          Background="Transparent"
          BorderThickness="0"
          Foreground="White"
@@ -69,13 +86,14 @@ Margin="10">
         </Grid>
 
         <!-- Filter Row -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20" Grid.ColumnSpan="2">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,20" >
             <Border BorderBrush="#4F7DF3" BorderThickness="1.5" CornerRadius="10" Padding="15,6" Margin="0,0,10,0">
                 <TextBlock Text="All Notes" Foreground="#4F7DF3" FontWeight="SemiBold"/>
             </Border>
 
-            <ComboBox Width="200" Height="36" SelectedIndex="0">
-                <ComboBoxItem Content="Recently Added"/>
+            <ComboBox Width="200" Height="36" SelectedIndex="0" Foreground="White">
+                <ComboBoxItem Content="Recently Added"
+                             Foreground="Black" />
             </ComboBox>
 
             <TextBlock Text="Sort by: Recently Added" VerticalAlignment="Center" Margin="15,0,0,0" Foreground="Gray"/>
@@ -131,7 +149,7 @@ Margin="10">
                     <TranslateTransform x:Name="EditorTransform" X="600"/>
                 </Grid.RenderTransform>
 
-                <Border Background="White"
+                <Border Background="white"
                 CornerRadius="25,0,0,25"
                 Padding="25">
 
