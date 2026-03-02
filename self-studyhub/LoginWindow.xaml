@@ -69,8 +69,6 @@
                          Padding="13"
                          Background="#3A8FA0"
                          materialDesign:HintAssist.Hint="Email"
-                        
-                      
                          Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
                 <!-- Password With Eye -->
