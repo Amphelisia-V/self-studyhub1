@@ -16,69 +16,53 @@ using System.Windows.Shapes;
 namespace self_studyhub
 {
     /// <summary>
-    /// Interaction logic for LoginWindow.xaml
+    /// Interaction logic for RegisterWindow.xaml
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class RegisterWindow : Window
     {
-       
-        public LoginWindow()
+        public RegisterWindow()
         {
             InitializeComponent();
         }
-        private void Login_Click(object sender, RoutedEventArgs e)
+        private void Register_Click(object sender, RoutedEventArgs e)
         {
-            string Email = txtEmail.Text;
+            MessageBox.Show("Account Created Successfully!");
 
-            // 👇 Visible ဖြစ်နေရင် TextBox ထဲကယူမယ်
-            string password = txtPassword.Visibility == Visibility.Visible
-                                ? txtPassword.Password
-                                : txtPasswordVisible.Text;
-
-            if (Email == "admin" && password == "1234")
-            {
-                MainWindow main = new MainWindow();
-                main.Show();
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Invalid Login");
-            }
+            LoginWindow login = new LoginWindow();
+            login.Show();
+            this.Close();
         }
+
+        private void BackToLogin_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow login = new LoginWindow();
+            login.Show();
+            this.Close();
+        }
+        private bool isVisible = false;
 
         private void TogglePassword_Click(object sender, RoutedEventArgs e)
         {
             if (txtPassword.Visibility == Visibility.Visible)
             {
                 txtPasswordVisible.Text = txtPassword.Password;
-
                 txtPassword.Visibility = Visibility.Collapsed;
                 txtPasswordVisible.Visibility = Visibility.Visible;
-
-                txtPasswordVisible.Focus();
-                txtPasswordVisible.CaretIndex = txtPasswordVisible.Text.Length;
-
                 eyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOffOutline;
             }
             else
             {
                 txtPassword.Password = txtPasswordVisible.Text;
-
-                txtPasswordVisible.Visibility = Visibility.Collapsed;
                 txtPassword.Visibility = Visibility.Visible;
-
-                txtPassword.Focus();
-
+                txtPasswordVisible.Visibility = Visibility.Collapsed;
                 eyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOutline;
             }
         }
-
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Fade in
-            DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(2));
-            loginPanel.BeginAnimation(OpacityProperty, fade);
+            DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1.5));
+            SignUpPanel.BeginAnimation(OpacityProperty, fade);
 
             // Slide up
             DoubleAnimation slide = new DoubleAnimation(40, 0, TimeSpan.FromSeconds(1));
@@ -87,7 +71,7 @@ namespace self_studyhub
                 EasingMode = EasingMode.EaseOut
             };
 
-            TranslateTransform transform = (TranslateTransform)loginPanel.RenderTransform;
+            TranslateTransform transform = (TranslateTransform)SignUpPanel.RenderTransform;
             transform.BeginAnimation(TranslateTransform.YProperty, slide);
         }
         private void OpenRegister_Click(object sender, RoutedEventArgs e)
@@ -96,6 +80,5 @@ namespace self_studyhub
             register.Show();
             this.Close();
         }
-    }  
     }
-
+}

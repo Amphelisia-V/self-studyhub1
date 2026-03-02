@@ -132,10 +132,14 @@
                         FontWeight="Bold"
                        Style="{StaticResource MaterialDesignRaisedButton}"/>
 
-                <TextBlock Text="New User? Create an account"
-                           Foreground="Gray"
-                           Margin="0,20,0,0"
-                           HorizontalAlignment="Center"/>
+                <Button Content="New User? Create an account"
+        Background="Transparent"
+        BorderThickness="0"
+        Foreground="#1A237E"
+        Cursor="Hand"
+        Margin="0,20,0,0"
+        HorizontalAlignment="Center"
+        Click="OpenRegister_Click"/>
             </StackPanel>
         </Border>
 
