@@ -3,15 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:syncfusion="clr-namespace:Syncfusion.Windows.PdfViewer;assembly=Syncfusion.PdfViewer.WPF"
-             mc:Ignorable="d" 
+              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+
+    mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000"
              Background="#1E1E1E">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
+            <!-- Toolbar -->
             <RowDefinition Height="*"/>
+            <!-- Main Layout -->
         </Grid.RowDefinitions>
 
         <!-- 🔹 Top Toolbar -->
@@ -25,27 +28,27 @@
         <!-- 🔹 Main Layout -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
-                <ColumnDefinition Width="130*"/>
-                <ColumnDefinition Width="34*"/>
-                <ColumnDefinition Width="83*"/>
-                <ColumnDefinition Width="503*"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="60"/>
+                <!-- Sidebar -->
+                <ColumnDefinition/>
+                <ColumnDefinition Width="24*"/>
+                <!-- PDF Viewer -->
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
-            <TabControl Grid.Column="0" Background="#252526" Foreground="White">
+            <TabControl Grid.Column="0" Background="#252526" Foreground="White" Grid.ColumnSpan="3">
                 <TabItem Header="Thumbnails">
                     <ListBox x:Name="ThumbnailList" Background="#252526" Foreground="White"/>
                 </TabItem>
-                <TabItem Header="Bookmarks">
+                <TabItem Header="Bookmarks / Notes">
                     <ListBox x:Name="BookmarkList" Background="#252526" Foreground="White"/>
                 </TabItem>
             </TabControl>
 
             <!-- PDF Viewer -->
-            <syncfusion:PdfViewerControl x:Name="pdfViewer"
-                                         Grid.Column="1"
-                                         Background="White" Grid.ColumnSpan="4"/>
+            <wv2:WebView2 x:Name="PdfViewer" Grid.Column="3" Grid.ColumnSpan="2" />
         </Grid>
     </Grid>
 </UserControl>
