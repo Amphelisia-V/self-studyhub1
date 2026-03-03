@@ -1,46 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Annot;
-using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf.Canvas.Parser.Listener;
-using iText.Kernel.Colors;
 using iText.Kernel.Geom;
-using System.IO;
-
+using iText.Kernel.Colors;
 
 namespace self_studyhub.Pages
 {
-   
-    /// <summary>
-    /// Interaction logic for pdfviewerpage.xaml
-    /// </summary>
     public partial class pdfviewerpage : UserControl
     {
-        string currentFilePath = "";
+        private string originalPath; // original PDF
+        private string editedPath;   // copy for editing
 
-        // ✅ Fake Database
-        List<PdfNote> fakeDatabase = new List<PdfNote>();
-
-        public pdfviewerpage(string filePath)
+        public pdfviewerpage()
         {
             InitializeComponent();
-            currentFilePath = filePath;
         }
 
+        // ================= OPEN PDF =================
         private async void OpenPdf_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -48,93 +28,112 @@ namespace self_studyhub.Pages
 
             if (dialog.ShowDialog() == true)
             {
-                currentFilePath = dialog.FileName;
+                originalPath = dialog.FileName;
 
+                // copy original to edited
+                editedPath = System.IO.Path.Combine(
+                    System.IO.Path.GetDirectoryName(originalPath),
+                    System.IO.Path.GetFileNameWithoutExtension(originalPath) + "_edited.pdf"
+                );
+
+                File.Copy(originalPath, editedPath, true);
+
+                // initialize WebView2 and load PDF
                 await PdfViewer.EnsureCoreWebView2Async();
-                PdfViewer.Source = new Uri(currentFilePath);
+                PdfViewer.Source = new Uri(editedPath);
+
+                MessageBox.Show("PDF copied and loaded!");
             }
         }
 
-        private async void Highlight_Click(object sender, RoutedEventArgs e)
+        // ================= HIGHLIGHT =================
+        private void Highlight_Click(object sender, RoutedEventArgs e)
         {
-            string selectedText = await PdfViewer.ExecuteScriptAsync("window.getSelection().toString();");
-            selectedText = selectedText.Replace("\"", "");
+            if (string.IsNullOrEmpty(editedPath))
+            {
+                MessageBox.Show("Open a PDF first.");
+                return;
+            }
 
-            if (!string.IsNullOrWhiteSpace(selectedText))
+            string tempPath = editedPath.Replace(".pdf", "_temp.pdf");
+
+            using (PdfDocument pdfDoc = new PdfDocument(
+                new PdfReader(editedPath),
+                new PdfWriter(tempPath)))
             {
-                // Add to sidebar
-                BookmarkList.Items.Add("🟡 " + selectedText);
+                PdfPage page = pdfDoc.GetPage(1); // demo: always first page
+
+                // Rectangle for highlight (demo coordinates)
+                iText.Kernel.Geom.Rectangle rect = new iText.Kernel.Geom.Rectangle(100, 600, 200, 20);
+
+                // create highlight annotation
+                var highlight = PdfTextMarkupAnnotation.CreateHighLight(rect, new float[] { 100, 600, 300, 600 });
+                highlight.SetColor(ColorConstants.YELLOW);
+
+                page.AddAnnotation(highlight);
             }
-            else
-            {
-                MessageBox.Show("Please select text first.");
-            }
+
+            // safely replace edited file
+            File.Delete(editedPath);
+            File.Move(tempPath, editedPath);
+
+            PdfViewer.Source = new Uri(editedPath);
+
+            MessageBox.Show("Highlight added!");
         }
 
+        // ================= ADD NOTE =================
         private void AddNote_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(currentFilePath))
+            if (string.IsNullOrEmpty(editedPath))
             {
-                MessageBox.Show("Please open a PDF first.");
+                MessageBox.Show("Open a PDF first.");
                 return;
             }
 
-            // WPF native input
-            Window inputWindow = new Window
+            string tempPath = editedPath.Replace(".pdf", "_temp.pdf");
+
+            using (PdfDocument pdfDoc = new PdfDocument(
+                new PdfReader(editedPath),
+                new PdfWriter(tempPath)))
             {
-                Title = "Add Note",
-                Width = 300,
-                Height = 150,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                ResizeMode = ResizeMode.NoResize
-            };
+                PdfPage page = pdfDoc.GetPage(1); // demo: first page
 
-            StackPanel stack = new StackPanel();
-            TextBox textBox = new TextBox { Margin = new Thickness(10) };
-            Button okButton = new Button { Content = "OK", Width = 60, Margin = new Thickness(10) };
-            stack.Children.Add(textBox);
-            stack.Children.Add(okButton);
-            inputWindow.Content = stack;
+                // Rectangle for sticky note
+                iText.Kernel.Geom.Rectangle rect = new iText.Kernel.Geom.Rectangle(100, 550, 20, 20);
 
-            okButton.Click += (s, ev) => inputWindow.DialogResult = true;
+                // Explicit cast
+                PdfTextAnnotation note = (PdfTextAnnotation)new PdfTextAnnotation(rect);
+                note.SetContents("This is my note");
+                note.Put(iText.Kernel.Pdf.PdfName.Open, iText.Kernel.Pdf.PdfBoolean.TRUE);
 
-            if (inputWindow.ShowDialog() == true)
-            {
-                string noteText = textBox.Text;
-                if (!string.IsNullOrWhiteSpace(noteText))
-                {
-                    BookmarkList.Items.Add("📝 " + noteText);
-                    fakeDatabase.Add(new PdfNote
-                    {
-                        FilePath = currentFilePath,
-                        SelectedText = noteText,
-                        CreatedDate = DateTime.Now
-                    });
-                }
+                page.AddAnnotation(note);
             }
+
+            File.Delete(editedPath);
+            File.Move(tempPath, editedPath);
+
+            PdfViewer.Source = new Uri(editedPath);
+            MessageBox.Show("Note added!");
         }
 
+        // ================= SAVE AS =================
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (BookmarkList.Items.Count == 0)
+            if (string.IsNullOrEmpty(editedPath))
             {
-                MessageBox.Show("No notes to save.");
+                MessageBox.Show("Nothing to save.");
                 return;
             }
 
-            foreach (var item in BookmarkList.Items)
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "PDF Files (*.pdf)|*.pdf";
+
+            if (dialog.ShowDialog() == true)
             {
-                PdfNote note = new PdfNote()
-                {
-                    FilePath = currentFilePath,
-                    SelectedText = item.ToString(),
-                    CreatedDate = DateTime.Now
-                };
-
-                fakeDatabase.Add(note);
+                File.Copy(editedPath, dialog.FileName, true);
+                MessageBox.Show("Saved Successfully!");
             }
-
-            MessageBox.Show("Saved to Fake Database!");
         }
     }
 }

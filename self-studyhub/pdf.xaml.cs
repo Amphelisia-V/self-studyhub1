@@ -43,7 +43,7 @@ namespace self_studyhub.Pages
 
                 // Get MainWindow
                 MainWindow main = (MainWindow)Application.Current.MainWindow;
-                main.MainContent.Content = new pdfviewerpage(selectedPath);
+                main.MainContent.Content = new pdfviewerpage();
             }
         }
 
