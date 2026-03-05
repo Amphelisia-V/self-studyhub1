@@ -56,10 +56,10 @@ mc:Ignorable="d"
 
 
     </Window.Resources>
-
+    
     <!-- ================= LAYOUT ================= -->
     <Grid>
-
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
@@ -216,7 +216,7 @@ mc:Ignorable="d"
                     </StackPanel>
                 </materialDesign:Card>
             </ContentControl>
-
+            
         </Grid>
     </Grid>
 

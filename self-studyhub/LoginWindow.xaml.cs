@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Data.SqlClient;
 
 namespace self_studyhub
 {
@@ -27,22 +28,50 @@ namespace self_studyhub
         }
         private void Login_Click(object sender, RoutedEventArgs e)
         {
-            string Email = txtEmail.Text;
+            string email = txtEmail.Text.Trim();
+            string password = txtPassword.Password.Trim();
 
-            // 👇 Visible ဖြစ်နေရင် TextBox ထဲကယူမယ်
-            string password = txtPassword.Visibility == Visibility.Visible
-                                ? txtPassword.Password
-                                : txtPasswordVisible.Text;
-
-            if (Email == "admin" && password == "1234")
+            if (email == "" || password == "")
             {
-                MainWindow main = new MainWindow();
-                main.Show();
-                this.Close();
+                MessageBox.Show("Please enter username and password", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else
+
+            try
             {
-                MessageBox.Show("Invalid Login");
+                using (SqlConnection con = new SqlConnection("Data Source=Localhost\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                {
+                    con.Open();
+
+                    string query = "SELECT id, username, email FROM Users_tb WHERE email=@Email AND password=@password";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.Parameters.AddWithValue("@password", password);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        int userId =Convert.ToInt32(reader["id"]);
+                        string userName = reader["username"].ToString();
+                        string emailFromDb = reader["email"].ToString(); // rename to avoid conflict
+
+                        MessageBox.Show($"Welcome {userName}!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        // Open HomePage (UserControl or Window)
+                        MainWindow main = new MainWindow(userId);
+                        main.Show();
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Username or password incorrect!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
             }
         }
 

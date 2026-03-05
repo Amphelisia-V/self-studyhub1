@@ -22,19 +22,21 @@ namespace self_studyhub
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private int userId;
+        public MainWindow(int userId)
         {
             InitializeComponent();
-            
+            this.userId = userId;
 
-            MainContent.Content = new HomePage();
+            // ✅ UserControl အဖြစ် HomePage load
+            MainContent.Content = new HomePage(this.userId);
         }
       
        
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new HomePage();
+            MainContent.Content = new HomePage(this.userId);
         }
 
         private void YouTubeButton_Click(object sender, RoutedEventArgs e)

@@ -67,7 +67,7 @@
                          Height="45"
                          Margin="0,10"
                          Padding="13"
-                         Background="#3A8FA0"
+                         Background="Transparent"
                          materialDesign:HintAssist.Hint="Email"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
@@ -80,7 +80,7 @@
                  FontSize="16"
                  FontWeight="SemiBold"
                  
-                 Background="#3A8FA0"
+                 Background="Transparent"
                  Padding="13,0,0,0"
                  materialDesign:HintAssist.Hint="Password"
                
@@ -130,7 +130,8 @@
                         Background="#0F1E5A"
                         Foreground="White"
                         FontWeight="Bold"
-                       Style="{StaticResource MaterialDesignRaisedButton}"/>
+                       Style="{StaticResource MaterialDesignRaisedButton}"
+                        materialDesign:ButtonAssist.CornerRadius="15"/>
 
                 <Button Content="New User? Create an account"
         Background="Transparent"

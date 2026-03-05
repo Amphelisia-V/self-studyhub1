@@ -20,15 +20,19 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace self_studyhub.Pages
 {
+    
     public partial class HomePage : UserControl
     {
         private DispatcherTimer timer;
         private TimeSpan timeLeft;
         private bool isRunning = false;
 
-        public HomePage()
+        private int userId;
+
+        public HomePage(int userId)
         {
             InitializeComponent();
+            
             DrawCircleProgress(0.6);
             UpdateDailyGoal(3, 15);
             Loaded += HomePage_Loaded;

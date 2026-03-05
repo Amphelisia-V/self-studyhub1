@@ -75,7 +75,7 @@ Width="280"/>
                         Background="White"
                         Margin="0,10">
 
-                        <TextBox x:Name="txtName" Height="45"
+                        <TextBox  x:Name="txtUsername" Height="45"
                              Padding="10"
                              FontSize="13"
                              FontWeight="SemiBold"
@@ -159,7 +159,8 @@ FontWeight="SemiBold"
                         Foreground="White"
                         FontWeight="Bold"
                         Style="{StaticResource MaterialDesignRaisedButton}"
-                        materialDesign:ButtonAssist.CornerRadius="15"/>
+                        materialDesign:ButtonAssist.CornerRadius="15"
+                            Click="Register_Click"/>
 
                     <Button Content="Back to Login"
         Background="Transparent"

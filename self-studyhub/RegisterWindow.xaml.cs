@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Data.SqlClient;
 
 namespace self_studyhub
 {
@@ -26,11 +27,63 @@ namespace self_studyhub
         }
         private void Register_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Account Created Successfully!");
+            string username = txtUsername.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string password = txtPassword.Password.Trim();
 
-            LoginWindow login = new LoginWindow();
-            login.Show();
-            this.Close();
+            if (username == "" || email == "" || password == "")
+            {
+                MessageBox.Show("Please fill all fields", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection("Data Source=Localhost\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                {
+                    con.Open();
+
+                    // Check if username or email already exists
+                    string checkQuery = "SELECT COUNT(*) FROM Users_tb WHERE username=@username OR email=@email";
+                    SqlCommand checkCmd = new SqlCommand(checkQuery, con);
+                    checkCmd.Parameters.AddWithValue("@username", username);
+                    checkCmd.Parameters.AddWithValue("@email", email);
+                    int exists = (int)checkCmd.ExecuteScalar();
+
+                    if (exists > 0)
+                    {
+                        MessageBox.Show("Username or Email already exists!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Insert new user
+                    string query = "INSERT INTO Users_tb (id,username,email,password) VALUES (@id,@username,@email,@password)";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@id", 1);
+                    cmd.Parameters.AddWithValue("@username", username);
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@password", password); // optional: hash password later
+
+                    int result = cmd.ExecuteNonQuery();
+
+                    if (result > 0)
+                    {
+                        MessageBox.Show("Account Created Successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        LoginWindow login = new LoginWindow();
+                        login.Show();
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Registration failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
         }
 
         private void BackToLogin_Click(object sender, RoutedEventArgs e)
@@ -43,20 +96,17 @@ namespace self_studyhub
 
         private void TogglePassword_Click(object sender, RoutedEventArgs e)
         {
-            if (txtPassword.Visibility == Visibility.Visible)
+            if (isVisible)
             {
-                txtPasswordVisible.Text = txtPassword.Password;
-                txtPassword.Visibility = Visibility.Collapsed;
-                txtPasswordVisible.Visibility = Visibility.Visible;
-                eyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOffOutline;
+                txtPassword.Visibility = Visibility.Visible;
+                txtPasswordVisible.Visibility = Visibility.Collapsed;
             }
             else
             {
-                txtPassword.Password = txtPasswordVisible.Text;
-                txtPassword.Visibility = Visibility.Visible;
-                txtPasswordVisible.Visibility = Visibility.Collapsed;
-                eyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOutline;
+                txtPassword.Visibility = Visibility.Collapsed;
+                txtPasswordVisible.Visibility = Visibility.Visible;
             }
+            isVisible = !isVisible; // toggle
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
