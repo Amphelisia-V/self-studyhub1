@@ -35,16 +35,16 @@
                      />
 
             <!-- Recent List -->
-            <ListBox 
-                     BorderBrush="#3E3E42"
-                     Foreground="White"
-                     Height="350">
+            <ListBox x:Name="RecentList"
+         SelectionChanged="RecentList_SelectionChanged"
+          Foreground="White">
 
                 <ListBoxItem Content="ProjectPlan.pdf"/>
                 <ListBoxItem Content="StudyGuide.pdf"/>
                 <ListBoxItem Content="Notes123.pdf"/>
                 <ListBoxItem Content="ResearchPaper.pdf"/>
-
+                <Frame x:Name="MainFrame"/>
+                <ContentControl x:Name="MainContent"/>
             </ListBox>
 
         </StackPanel>

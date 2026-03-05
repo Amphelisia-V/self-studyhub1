@@ -15,9 +15,24 @@ namespace self_studyhub.Pages
         private string originalPath; // original PDF
         private string editedPath;   // copy for editing
 
-        public pdfviewerpage()
+        public pdfviewerpage(string pdfPath)
         {
             InitializeComponent();
+            originalPath = pdfPath;
+
+            editedPath = System.IO.Path.Combine(
+                System.IO.Path.GetDirectoryName(originalPath),
+                System.IO.Path.GetFileNameWithoutExtension(originalPath) + "_edited.pdf"
+            );
+
+            File.Copy(originalPath, editedPath, true);
+
+            LoadPdf();
+        }
+        private async void LoadPdf()
+        {
+            await PdfViewer.EnsureCoreWebView2Async();
+            PdfViewer.Source = new Uri(editedPath);
         }
 
         // ================= OPEN PDF =================

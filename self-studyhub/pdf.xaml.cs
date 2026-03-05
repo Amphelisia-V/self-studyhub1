@@ -14,7 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32; // For OpenFileDialog
 using System.IO;
-
+using System.Diagnostics;
+using self_studyhub.Pages;
 
 namespace self_studyhub.Pages
 {
@@ -32,6 +33,27 @@ namespace self_studyhub.Pages
             ViewNotesButton.Click += ViewNotesButton_Click;
         }
 
+        private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RecentList.SelectedItem != null)
+            {
+                ListBoxItem item = (ListBoxItem)RecentList.SelectedItem;
+
+                string filename = item.Content.ToString();
+
+                // Project folder အတိုင်း full path
+                string fullPath = System.IO.Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    filename);
+
+                // MainFrame ထဲကို load လုပ်မယ်
+                MainWindow main = (MainWindow)Application.Current.MainWindow;
+
+                // ဒီနေရာမှာ pdfviewerpage constructor မှာ path ပေးပြီး load
+                main.MainContent.Content = new pdfviewerpage(fullPath);
+            }
+        }
+
         private void OpenPDFButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -41,20 +63,53 @@ namespace self_studyhub.Pages
             {
                 string selectedPath = openFileDialog.FileName;
 
-                // Get MainWindow
+                // Pass the PDF path to pdfviewerpage constructor
                 MainWindow main = (MainWindow)Application.Current.MainWindow;
-                main.MainContent.Content = new pdfviewerpage();
+
+                // Create pdfviewerpage like OpenPdf_Click in pdfviewerpage.xaml.cs
+                pdfviewerpage viewer = new pdfviewerpage(selectedPath);
+
+                main.MainContent.Content = viewer;
+
+                MessageBox.Show("PDF copied and loaded into viewer!");
             }
         }
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Continue last session clicked");
+            string file = "lastsession.txt";
+
+            if (File.Exists(file))
+            {
+                string[] data = File.ReadAllLines(file);
+
+                string pdfPath = data[0];
+                int page = int.Parse(data[1]);
+
+                MessageBox.Show("Opening Last Session\nPDF: " + pdfPath + "\nPage: " + page);
+
+                //ဒီနေရာမှာ PDF viewer ကို open လုပ်နိုင်တယ်
+            }
+            else
+            {
+                MessageBox.Show("No previous session found.");
+            }
         }
 
         private void ViewNotesButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("View notes clicked");
+            string noteFile = "notes.txt";
+
+            if (File.Exists(noteFile))
+            {
+                string notes = File.ReadAllText(noteFile);
+
+                MessageBox.Show(notes, "My Notes");
+            }
+            else
+            {
+                MessageBox.Show("No notes found.");
+            }
         }
     }
 }
