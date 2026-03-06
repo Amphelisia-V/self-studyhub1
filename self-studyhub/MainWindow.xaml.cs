@@ -26,7 +26,7 @@ namespace self_studyhub
         YouTubePage youTubePage = new YouTubePage();
         BrowserPage browserPage = new BrowserPage();
         PDFPage pDFPage = new PDFPage();
-        note note = new note();
+        NotePage note = new NotePage();
         public MainWindow()
         {
             InitializeComponent();
