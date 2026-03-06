@@ -45,7 +45,7 @@ namespace self_studyhub.Pages
         }
         
 
-        private  void LoadVideo_Click(object sender, RoutedEventArgs e)
+        private void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
            if(VideoView != null && VideoView.CoreWebView2 !=null)
             {

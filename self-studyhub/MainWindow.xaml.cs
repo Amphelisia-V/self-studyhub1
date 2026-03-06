@@ -22,42 +22,47 @@ namespace self_studyhub
     /// </summary>
     public partial class MainWindow : Window
     {
+        HomePage homePage = new HomePage();
+        YouTubePage youTubePage = new YouTubePage();
+        BrowserPage browserPage = new BrowserPage();
+        PDFPage pDFPage = new PDFPage();
+        note note = new note();
         public MainWindow()
         {
             InitializeComponent();
-            MainContent.Content = new PDFPage();
 
-            MainContent.Content = new HomePage();
+            MainContent.Content = homePage;
+
         }
       
        
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new HomePage();
+            MainContent.Content = homePage;
         }
 
         private void YouTubeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new YouTubePage();
+            MainContent.Content = youTubePage;
         }
 
         private void BrowserButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new BrowserPage();
+            MainContent.Content = browserPage;
 
            
         }
 
         private void PDFButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new PDFPage();
+            MainContent.Content = pDFPage;
 
         }
 
         private void NoteButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new NotePage();
+            MainContent.Content = note;
         }
 
         private void PackIcon_ColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)

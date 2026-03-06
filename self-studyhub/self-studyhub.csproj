@@ -25,7 +25,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>1</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -169,9 +169,7 @@
     <Compile Include="BrowserPage.xaml.cs">
       <DependentUpon>BrowserPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="note.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="note.cs" />
     <Compile Include="note.Designer.cs">
       <DependentUpon>note.cs</DependentUpon>
     </Compile>
