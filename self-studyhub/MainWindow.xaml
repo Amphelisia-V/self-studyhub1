@@ -13,7 +13,7 @@ mc:Ignorable="d"
         Width="1100"
         Background="#181818">
 
-
+    
 
     <!-- ================= RESOURCES ================= -->
     <Window.Resources>
@@ -59,7 +59,6 @@ mc:Ignorable="d"
     
     <!-- ================= LAYOUT ================= -->
     <Grid>
-        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>

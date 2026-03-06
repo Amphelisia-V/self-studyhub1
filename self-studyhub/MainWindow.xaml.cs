@@ -26,10 +26,9 @@ namespace self_studyhub
         public MainWindow(int userId)
         {
             InitializeComponent();
-            this.userId = userId;
+            MainContent.Content = new PDFPage();
 
-            // ✅ UserControl အဖြစ် HomePage load
-            MainContent.Content = new HomePage(this.userId);
+            MainContent.Content = new HomePage();
         }
       
        
