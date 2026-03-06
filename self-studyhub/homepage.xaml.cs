@@ -20,19 +20,23 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace self_studyhub.Pages
 {
+    
     public partial class HomePage : UserControl
     {
         private DispatcherTimer timer;
         private TimeSpan timeLeft;
         private bool isRunning = false;
 
-        public HomePage()
+        private int userId;
+
+        public HomePage(int userId)
         {
             InitializeComponent();
+            
             DrawCircleProgress(0.6);
             UpdateDailyGoal(3, 15);
             Loaded += HomePage_Loaded;
-            TaskListBox.ItemsSource = allTasks;
+            
         
 
         timeLeft = TimeSpan.FromMinutes(25);
@@ -202,24 +206,9 @@ namespace self_studyhub.Pages
         {
             CustomMessage.Visibility = Visibility.Collapsed;
         }
-        private List<string> allTasks = new List<string>()
-{
-    "Study C#",
-    "Watch tutorial",
-    "Complete assignment",
-    "Practice coding"
-};
+       
 
-        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            string keyword = SearchBox.Text.ToLower();
-
-            var filtered = allTasks
-                .Where(task => task.ToLower().Contains(keyword))
-                .ToList();
-
-            TaskListBox.ItemsSource = filtered;
-        }
+        
     }
 }
 

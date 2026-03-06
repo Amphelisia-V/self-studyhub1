@@ -56,7 +56,7 @@ mc:Ignorable="d"
 
 
     </Window.Resources>
-
+    
     <!-- ================= LAYOUT ================= -->
     <Grid>
         <Grid.ColumnDefinitions>
@@ -215,7 +215,7 @@ mc:Ignorable="d"
                     </StackPanel>
                 </materialDesign:Card>
             </ContentControl>
-
+            
         </Grid>
     </Grid>
 
