@@ -91,7 +91,7 @@
                  FontSize="14"
                  Text="Search tasks, notes, videos..."
                  CaretBrush="Transparent"
-                         TextChanged="SearchBox_TextChanged"
+                         
                          />
             </DockPanel>
         </Border>

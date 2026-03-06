@@ -22,15 +22,15 @@ namespace self_studyhub
     /// </summary>
     public partial class MainWindow : Window
     {
-        HomePage homePage = new HomePage();
+        HomePage homePage ;
         YouTubePage youTubePage = new YouTubePage();
         BrowserPage browserPage = new BrowserPage();
         PDFPage pDFPage = new PDFPage();
         NotePage note = new NotePage();
-        public MainWindow()
+        public MainWindow(int userID)
         {
             InitializeComponent();
-
+            homePage = new HomePage(userID);
             MainContent.Content = homePage;
 
         }

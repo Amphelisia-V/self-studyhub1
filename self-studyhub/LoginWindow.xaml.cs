@@ -39,7 +39,7 @@ namespace self_studyhub
 
             try
             {
-                using (SqlConnection con = new SqlConnection("Data Source=Localhost\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                using (SqlConnection con = new SqlConnection("Data Source=localhost\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
                 {
                     con.Open();
 
@@ -124,6 +124,12 @@ namespace self_studyhub
             RegisterWindow register = new RegisterWindow();
             register.Show();
             this.Close();
+        }
+
+        private void Forgotpw_Click(object sender, RoutedEventArgs e)
+        {
+            ForgotPasswordWindow forgotWindow = new ForgotPasswordWindow();
+            forgotWindow.ShowDialog();
         }
     }  
     }

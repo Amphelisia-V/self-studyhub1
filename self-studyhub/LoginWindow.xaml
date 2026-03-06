@@ -133,7 +133,7 @@
                        Style="{StaticResource MaterialDesignRaisedButton}"
                         materialDesign:ButtonAssist.CornerRadius="15"/>
 
-                <Button Content="New User? Create an account"
+                <Button Content=" Create an account"
         Background="Transparent"
         BorderThickness="0"
         Foreground="#1A237E"
@@ -141,6 +141,15 @@
         Margin="0,20,0,0"
         HorizontalAlignment="Center"
         Click="OpenRegister_Click"/>
+                <Button Content=" forgot password?"
+        Background="Transparent"
+        BorderThickness="0"
+        Foreground="#1A237E"
+        Cursor="Hand"
+        Margin="65,20,95,0"
+        HorizontalAlignment="Center"
+                         Click="Forgotpw_Click"
+        />
             </StackPanel>
         </Border>
 
