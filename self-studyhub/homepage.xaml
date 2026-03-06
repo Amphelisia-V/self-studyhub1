@@ -32,6 +32,7 @@
            
 
             <DockPanel Height="60" VerticalAlignment="Top" >
+                
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="left" VerticalAlignment="Center">
                     <Image Source="D:\4CS\Project\app_logo\logo2.jpg"
                Width="40"
@@ -39,9 +40,10 @@
                Margin="0,0,10,0"/>
                     <TextBlock Text="StudyControl" FontSize="24" FontWeight="Bold" Foreground="White"  />
                 </StackPanel>
-            </Border>
+                
+            
 
-                    <!-- Study Streak -->
+            <!-- Study Streak -->
                     <Border Background="#FF2E2E2E" CornerRadius="5" Padding="5" Margin="0,0,5,0" Height="40">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="🔥" FontSize="16" Margin="0,0,5,0" Foreground="Red"/>
@@ -55,7 +57,7 @@
                       Margin="5"/>
 
 
-                </StackPanel>
+
             </DockPanel>
         </Grid>
         <!-- ================= SEARCH ================= -->
@@ -86,7 +88,7 @@
                  Foreground="White"
                  FontSize="14"
                  Text="Search tasks, notes, videos..."
-                 CaretBrush="White"
+                 CaretBrush="Transparent"
                          TextChanged="SearchBox_TextChanged"
                          />
             </DockPanel>
