@@ -25,7 +25,7 @@ namespace self_studyhub
         public MainWindow()
         {
             InitializeComponent();
-            
+            MainContent.Content = new PDFPage();
 
             MainContent.Content = new HomePage();
         }
