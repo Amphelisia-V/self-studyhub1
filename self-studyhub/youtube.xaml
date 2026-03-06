@@ -59,11 +59,13 @@ Margin="10">
          Foreground="White"
          FontSize="16"
          VerticalContentAlignment="Center"/>
-                    <Button Content="Load"
-                            Margin="10,0,0,0"
-                            Click="LoadVideo_Click" Height="32" VerticalAlignment="Top"/>
+                    
                 </StackPanel>
-            </Border>
+                            </Border>
+            <Button Content="Load" Grid.Column="3"
+                            Margin="0,0,10,0"
+                            Click="LoadVideo_Click" Height="32" VerticalAlignment="Top"/>
+
 
         </Grid>
         <Grid Grid.Row="1">

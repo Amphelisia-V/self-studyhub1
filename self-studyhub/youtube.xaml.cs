@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.WinForms;
+using Microsoft.Web.WebView2.Wpf;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Web.WebView2.Wpf;
+
 namespace self_studyhub.Pages
 {
     /// <summary>
@@ -42,66 +45,26 @@ namespace self_studyhub.Pages
         }
         
 
-        private async void LoadVideo_Click(object sender, RoutedEventArgs e)
+        private  void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
-            if (VideoView.CoreWebView2 == null)
+           if(VideoView != null && VideoView.CoreWebView2 !=null)
             {
-                MessageBox.Show("WebView is still loading. Please wait.");
-                return;
-            }
-
-            string url = youtubelinkbox.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                MessageBox.Show("Please paste a YouTube link");
-                return;
-            }
-
-            string embedUrl = ConvertToEmbedUrl(url);
-
-            if (embedUrl == null)
-            {
-                MessageBox.Show("Invalid YouTube link");
-                return;
-            }
-
-            // 3️⃣ Navigate YouTube embed
-            VideoView.CoreWebView2.Navigate(embedUrl);
-        }
-        // 4️⃣ YouTube link → embed link
-        private string ConvertToEmbedUrl(string url)
-        {
-            try
-            {
-                // https://www.youtube.com/watch?v=VIDEOID
+                string url = youtubelinkbox.Text;
                 if (url.Contains("watch?v="))
                 {
-                    string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
-                                        .Split('&')[0];
-                    return $"https://www.youtube.com/embed/{videoId}";
+                    string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1].Split('&')[0];
+                    string embedUrl = $"https://www.youtube.com/embed/{videoId}";
+                    VideoView.CoreWebView2.Navigate(embedUrl);
+                }
+                else if (url.StartsWith("https://"))
+                {
+                    VideoView.CoreWebView2.Navigate(url);
                 }
 
-                // https://youtu.be/VIDEOID
-                if (url.Contains("youtu.be/"))
-                {
-                    string videoId = url.Split(new[] { "youtu.be/" }, StringSplitOptions.None)[1]
-                                        .Split('?')[0];
-                    return $"https://www.youtube.com/embed/{videoId}";
-                }
-
-                // Already embed
-                if (url.Contains("youtube.com/embed/"))
-                {
-                    return url;
-                }
-            }
-            catch
+            }else
             {
-                return null;
+                MessageBox.Show("please wait a second");
             }
-
-            return null;
         }
     }
 

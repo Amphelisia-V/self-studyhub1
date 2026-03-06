@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
 
 namespace self_studyhub.Pages
 {
@@ -20,9 +21,15 @@ namespace self_studyhub.Pages
     /// </summary>
     public partial class HomePage : UserControl
     {
+        ObservableCollection<string> tasks = new ObservableCollection<string>();
         public HomePage()
         {
             InitializeComponent();
+
         }
+
+
+
     }
 }
+
