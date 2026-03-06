@@ -187,6 +187,9 @@
     <Compile Include="pdf.xaml.cs">
       <DependentUpon>pdf.xaml</DependentUpon>
     </Compile>
+    <Compile Include="pdfviewerpage.xaml.cs">
+      <DependentUpon>pdfviewerpage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RegisterWindow.xaml.cs">
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
@@ -229,6 +232,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="pdf.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="pdfviewerpage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
