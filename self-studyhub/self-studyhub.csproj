@@ -169,7 +169,9 @@
     <Compile Include="BrowserPage.xaml.cs">
       <DependentUpon>BrowserPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="note.cs" />
+    <Compile Include="note.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="note.Designer.cs">
       <DependentUpon>note.cs</DependentUpon>
     </Compile>
