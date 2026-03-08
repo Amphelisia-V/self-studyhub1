@@ -32,7 +32,7 @@ namespace self_studyhub.Pages
         private async void LoadPdf()
         {
             await PdfViewer.EnsureCoreWebView2Async();
-            PdfViewer.Source = new Uri(editedPath);
+            PdfViewer.Source = new Uri(editedPath, UriKind.Absolute);
         }
 
         // ================= OPEN PDF =================

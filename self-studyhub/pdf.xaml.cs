@@ -41,21 +41,16 @@ namespace self_studyhub.Pages
 
                 string filename = item.Content.ToString();
 
-                // Project folder အတိုင်း full path
                 string fullPath = System.IO.Path.Combine(
                     AppDomain.CurrentDomain.BaseDirectory,
                     filename);
 
-                // MainFrame ထဲကို load လုပ်မယ်
                 MainWindow main = Application.Current.MainWindow as MainWindow;
 
                 if (main != null)
                 {
                     main.MainContent.Content = new pdfviewerpage(fullPath);
                 }
-
-               
-                
             }
         }
 
@@ -68,15 +63,8 @@ namespace self_studyhub.Pages
             {
                 string selectedPath = openFileDialog.FileName;
 
-                MainWindow main = Application.Current.MainWindow as MainWindow;
-
-                if (main != null)
-                {
-                    pdfviewerpage viewer = new pdfviewerpage(selectedPath);
-                    main.MainContent.Content = viewer;
-                }
-
-                MessageBox.Show("PDF copied and loaded into viewer!");
+                pdfviewerpage viewer = new pdfviewerpage(selectedPath);
+                ViewerContainer.Content = viewer;
             }
         }
 
@@ -117,4 +105,6 @@ namespace self_studyhub.Pages
             }
         }
     }
+
+   
 }

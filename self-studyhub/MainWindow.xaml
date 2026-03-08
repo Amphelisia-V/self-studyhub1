@@ -203,22 +203,10 @@ mc:Ignorable="d"
         <!-- ================= MAIN CONTENT ================= -->
         <Grid Grid.Column="1" Background="#121212">
 
-            
 
-            <ContentControl x:Name="MainContent" Margin="20">
-                <materialDesign:Card Padding="20" Background="#1E1E1E">
-                    <StackPanel>
-                        <TextBlock Text="Welcome to Study Hub"
-                                   Foreground="White"
-                                   FontSize="24"
-                                   FontWeight="Bold"/>
-                        <TextBlock Text="Select an option from the sidebar."
-                                   Foreground="Gray"
-                                   Margin="0,10,0,0"/>
-                    </StackPanel>
-                </materialDesign:Card>
-            </ContentControl>
-            
+
+            <ContentControl x:Name="MainContent" Margin="20"/>
+
         </Grid>
     </Grid>
 
