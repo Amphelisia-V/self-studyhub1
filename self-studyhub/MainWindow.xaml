@@ -81,6 +81,9 @@ mc:Ignorable="d"
             <StackPanel x:Name="Sidebar"
                 Width="45"
                 Background="#202020">
+                <Grid>
+                    
+                </Grid>
 
                 <!-- Toggle -->
                 <ToggleButton x:Name="ToggleSidebar"  HorizontalAlignment="Left"

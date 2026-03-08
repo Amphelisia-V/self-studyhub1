@@ -5,7 +5,13 @@
         xmlns:materialDesignControls="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
 
              Background="#121212">
-    <Grid Margin="20">
+    <Grid >
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assests/background2.jpg"
+                    Stretch="UniformToFill"
+                    Opacity="0.8"/>
+        </Grid.Background>
+        <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="388*"/>
             <ColumnDefinition Width="277*"/>
@@ -195,6 +201,7 @@ Margin="10">
                     </Grid>
                 </Border>
             </Grid>
+        </Grid>
         </Grid>
     </Grid>
 </UserControl>

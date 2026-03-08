@@ -5,7 +5,11 @@
              Background="#121212">
 
     <Grid>
-
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assests/background2.jpg"
+                    Stretch="UniformToFill"
+                    Opacity="0.8"/>
+        </Grid.Background>
         <!-- FIRST SCREEN : CUSTOM SEARCH UI -->
         <StackPanel x:Name="SearchPanel"
                     VerticalAlignment="Center"

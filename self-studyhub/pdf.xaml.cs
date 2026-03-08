@@ -47,10 +47,15 @@ namespace self_studyhub.Pages
                     filename);
 
                 // MainFrame ထဲကို load လုပ်မယ်
-                MainWindow main = (MainWindow)Application.Current.MainWindow;
+                MainWindow main = Application.Current.MainWindow as MainWindow;
 
-                // ဒီနေရာမှာ pdfviewerpage constructor မှာ path ပေးပြီး load
-                main.MainContent.Content = new pdfviewerpage(fullPath);
+                if (main != null)
+                {
+                    main.MainContent.Content = new pdfviewerpage(fullPath);
+                }
+
+               
+                
             }
         }
 
@@ -63,13 +68,13 @@ namespace self_studyhub.Pages
             {
                 string selectedPath = openFileDialog.FileName;
 
-                // Pass the PDF path to pdfviewerpage constructor
-                MainWindow main = (MainWindow)Application.Current.MainWindow;
+                MainWindow main = Application.Current.MainWindow as MainWindow;
 
-                // Create pdfviewerpage like OpenPdf_Click in pdfviewerpage.xaml.cs
-                pdfviewerpage viewer = new pdfviewerpage(selectedPath);
-
-                main.MainContent.Content = viewer;
+                if (main != null)
+                {
+                    pdfviewerpage viewer = new pdfviewerpage(selectedPath);
+                    main.MainContent.Content = viewer;
+                }
 
                 MessageBox.Show("PDF copied and loaded into viewer!");
             }
