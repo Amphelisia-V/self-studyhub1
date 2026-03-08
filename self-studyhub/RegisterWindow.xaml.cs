@@ -16,9 +16,7 @@ using System.Data.SqlClient;
 
 namespace self_studyhub
 {
-    /// <summary>
-    /// Interaction logic for RegisterWindow.xaml
-    /// </summary>
+   
     public partial class RegisterWindow : Window
     {
         public RegisterWindow()
@@ -57,9 +55,9 @@ namespace self_studyhub
                     }
 
                     // Insert new user
-                    string query = "INSERT INTO Users_tb (id,username,email,password) VALUES (@id,@username,@email,@password)";
+                    string query = "INSERT INTO Users_tb (username,email,password) VALUES (@username,@email,@password)";
                     SqlCommand cmd = new SqlCommand(query, con);
-                    cmd.Parameters.AddWithValue("@id", 1);
+                   
                     cmd.Parameters.AddWithValue("@username", username);
                     cmd.Parameters.AddWithValue("@email", email);
                     cmd.Parameters.AddWithValue("@password", password); // optional: hash password later

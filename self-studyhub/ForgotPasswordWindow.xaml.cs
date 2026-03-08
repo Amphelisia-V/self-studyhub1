@@ -34,11 +34,11 @@ namespace self_studyhub
         private void ResetPassword_Click(object sender, RoutedEventArgs e)
         {
             string username = txtUsername.Text.Trim();
-            string answer = txtAnswer.Text.Trim();
+            string email = txtEmail.Text.Trim();
 
-            if (username == "")
+            if (username == "" || email == "")
             {
-                MessageBox.Show("Enter your username", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please enter both username and email", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -48,44 +48,34 @@ namespace self_studyhub
                 {
                     con.Open();
 
-                    // Step 1: get secret question + hashed answer
-                    string query = "SELECT id, SecretQuestion, SecretAnswerHash FROM Users_tb WHERE username=@username";
+                    string query = "SELECT id FROM Users_tb WHERE username=@username AND email=@Email";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("@username", username);
+                    cmd.Parameters.AddWithValue("@Email", email);
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     if (reader.Read())
                     {
-                        userId = Convert.ToInt32(reader["id"]);
-                        lblSecretQuestion.Text = reader["SecretQuestion"].ToString();
-                        secretAnswerHash = reader["SecretAnswerHash"].ToString();
+                        int userId = Convert.ToInt32(reader["id"]);
                         reader.Close();
 
-                        // Step 2: verify answer
-                        string answerHash = ComputeSha256Hash(answer);
-                        if (answerHash == secretAnswerHash)
-                        {
-                            // Step 3: generate temporary password
-                            string tempPassword = GenerateTempPassword();
+                        // Generate temporary password
+                        string tempPassword = GenerateTempPassword();
 
-                            // Update password in DB
-                            string updateQuery = "UPDATE Users_tb SET password=@tempPassword WHERE id=@id";
-                            SqlCommand updateCmd = new SqlCommand(updateQuery, con);
-                            updateCmd.Parameters.AddWithValue("@tempPassword", tempPassword);
-                            updateCmd.Parameters.AddWithValue("@id", userId);
-                            updateCmd.ExecuteNonQuery();
+                        // Update password in DB
+                        string updateQuery = "UPDATE Users_tb SET password=@tempPassword WHERE id=@id";
+                        SqlCommand updateCmd = new SqlCommand(updateQuery, con);
+                        updateCmd.Parameters.AddWithValue("@tempPassword", tempPassword);
+                        updateCmd.Parameters.AddWithValue("@id", userId);
+                        updateCmd.ExecuteNonQuery();
 
-                            MessageBox.Show($"Your temporary password: {tempPassword}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                            this.Close();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Secret answer is incorrect!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        }
+                        MessageBox.Show($"Temporary password: {tempPassword}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        this.Close();
                     }
                     else
                     {
-                        MessageBox.Show("Username not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("Username or email is incorrect!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
             }
@@ -102,17 +92,7 @@ namespace self_studyhub
                 .Select(s => s[rnd.Next(s.Length)]).ToArray());
         }
 
-        private string ComputeSha256Hash(string rawData)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                StringBuilder builder = new StringBuilder();
-                foreach (var b in bytes)
-                    builder.Append(b.ToString("x2"));
-                return builder.ToString();
-            }
-        }
+        
 
         private void BackToLogin_Click(object sender, RoutedEventArgs e)
         {
