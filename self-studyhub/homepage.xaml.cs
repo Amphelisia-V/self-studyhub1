@@ -43,7 +43,8 @@ namespace self_studyhub.Pages
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += Timer_Tick;// Example
+            timer.Tick += Timer_Tick;
+            UpdateTimerUI();
         }
         
         private void OpenTaskModal(object sender, RoutedEventArgs e)
@@ -76,46 +77,87 @@ namespace self_studyhub.Pages
                 TaskList.Items.Remove(TaskList.SelectedItem);
             }
         }
-        
-           
-            private void Timer_Tick(object sender, EventArgs e)
-            {
-                if (timeLeft.TotalSeconds > 0)
-                {
-                    timeLeft = timeLeft.Subtract(TimeSpan.FromSeconds(1));
-                    TimerText.Text = timeLeft.ToString(@"mm\:ss");
-                }
-                else
-                {
-                    timer.Stop();
-                    MessageBox.Show("Time's up!");
-                    StartButton.Content = "START";
-                    isRunning = false;
-                }
-            }
 
-            private void StartTimer(object sender, RoutedEventArgs e)
+
+        // ================= TIMER LOGIC =================
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (timeLeft.TotalSeconds > 0)
             {
-                if (!isRunning)
+                timeLeft = timeLeft.Subtract(TimeSpan.FromSeconds(1));
+                UpdateTimerUI();
+
+                // 🔥 Last 10 sec sound
+                if (timeLeft.TotalSeconds <= 10 && timeLeft.TotalSeconds > 0)
                 {
-                    timer.Start();
-                    StartButton.Content = "STOP";
-                    isRunning = true;
-                }
-                else
-                {
-                    timer.Stop();
-                    StartButton.Content = "START";
-                    isRunning = false;
+                    Console.Beep();
                 }
             }
+            else
+            {
+                timer.Stop();
+
+                // 🔔 Finish sound
+                Console.Beep();
+
+                TimerText.Text = "00:00";
+                StartButton.Content = "START";
+                TimerText.Foreground = Brushes.White;
+                isRunning = false;
+
+                MessageBox.Show("Time's up! 🎉");
+            }
+        }
+
+        private void StartTimer(object sender, RoutedEventArgs e)
+        {
+            if (!timer.IsEnabled)
+            {
+                timer.Start();
+                StartButton.Content = "PAUSE";
+                isRunning = true;
+            }
+            else
+            {
+                timer.Stop();
+                StartButton.Content = "RESUME";
+                isRunning = false;
+            }
+        }
+
         private void ResetTimer(object sender, RoutedEventArgs e)
         {
             timer.Stop();
             timeLeft = TimeSpan.FromMinutes(25);
-            TimerText.Text = timeLeft.ToString(@"mm\:ss");
+
+            UpdateTimerUI();
+
             StartButton.Content = "START";
+            TimerText.Foreground = Brushes.White;
             isRunning = false;
+        }
+
+        // ================= UI UPDATE =================
+
+        private void UpdateTimerUI()
+        {
+            TimerText.Text = timeLeft.ToString(@"mm\:ss");
+
+            // 🔴 Last 5 min color change
+            if (timeLeft.TotalMinutes <= 5)
+            {
+                TimerText.Foreground = Brushes.Red;
+            }
+            else
+            {
+                TimerText.Foreground = Brushes.White;
+            }
+
+            // 🔥 OPTIONAL: Circle Progress (if you use DrawCircleProgress)
+            double totalSeconds = 1500; // 25 min
+            double percent = timeLeft.TotalSeconds / totalSeconds;
+            DrawCircleProgress(percent);
         }
         private void Task_Checked(object sender, RoutedEventArgs e)
         {
