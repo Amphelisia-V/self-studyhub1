@@ -28,6 +28,7 @@ namespace self_studyhub.Pages
         private bool isRunning = false;
 
         private int userId;
+        private int focusMinutes = 25;
 
         public HomePage(int userId)
         {
@@ -112,8 +113,23 @@ namespace self_studyhub.Pages
 
         private void StartTimer(object sender, RoutedEventArgs e)
         {
-            if (!timer.IsEnabled)
+            if (!isRunning)
             {
+                // ⬇ Read user input
+                if (!int.TryParse(TimeInput.Text, out focusMinutes) || focusMinutes <= 0)
+                {
+                    MessageBox.Show("Enter valid minutes!");
+                    return;
+                }
+                if(focusMinutes>300)
+               {
+               MessageBox.Show("maximum is 300 minutes");
+               return;
+               }
+
+                // ⬇ Set time based on input
+                timeLeft = TimeSpan.FromMinutes(focusMinutes);
+
                 timer.Start();
                 StartButton.Content = "PAUSE";
                 isRunning = true;
@@ -124,12 +140,15 @@ namespace self_studyhub.Pages
                 StartButton.Content = "RESUME";
                 isRunning = false;
             }
+
+            UpdateTimerUI();
         }
 
         private void ResetTimer(object sender, RoutedEventArgs e)
         {
             timer.Stop();
-            timeLeft = TimeSpan.FromMinutes(25);
+
+            timeLeft = TimeSpan.FromMinutes(focusMinutes);
 
             UpdateTimerUI();
 
@@ -142,7 +161,7 @@ namespace self_studyhub.Pages
 
         private void UpdateTimerUI()
         {
-            TimerText.Text = timeLeft.ToString(@"mm\:ss");
+            TimerText.Text = timeLeft.ToString(@"hh\:mm\:ss");
 
             // 🔴 Last 5 min color change
             if (timeLeft.TotalMinutes <= 5)
@@ -155,7 +174,7 @@ namespace self_studyhub.Pages
             }
 
             // 🔥 OPTIONAL: Circle Progress (if you use DrawCircleProgress)
-            double totalSeconds = 1500; // 25 min
+            double totalSeconds = focusMinutes*60; // 25 min
             double percent = timeLeft.TotalSeconds / totalSeconds;
             DrawCircleProgress(percent);
         }

@@ -39,7 +39,7 @@ namespace self_studyhub
 
             try
             {
-                using (SqlConnection con = new SqlConnection("Data Source=localhost\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-8BBV09R\\MSSQLSERVER01;Initial Catalog=StudyControlDB;Integrated Security=True;Encrypt=True;TrustServerCertificate=True"))
                 {
                     con.Open();
 
