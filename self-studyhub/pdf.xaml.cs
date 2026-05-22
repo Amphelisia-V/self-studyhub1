@@ -28,9 +28,7 @@ namespace self_studyhub.Pages
         {
             InitializeComponent();
             // Hook up buttons
-            OpenPDFButton.Click += OpenPDFButton_Click;
-            ContinueButton.Click += ContinueButton_Click;
-            ViewNotesButton.Click += ViewNotesButton_Click;
+           
         }
 
         private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -56,15 +54,32 @@ namespace self_studyhub.Pages
 
         private void OpenPDFButton_Click(object sender, RoutedEventArgs e)
         {
+            MessageBox.Show("Step 1");
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "PDF files (*.pdf)|*.pdf";
 
             if (openFileDialog.ShowDialog() == true)
             {
+                MessageBox.Show("Step 2");
+
+                var main = Application.Current.MainWindow as MainWindow;
+
+                if (main == null)
+                {
+                    MessageBox.Show("MainWindow is NULL");
+                    return;
+                }
+
+                MessageBox.Show("Step 3");
+
                 string selectedPath = openFileDialog.FileName;
 
                 pdfviewerpage viewer = new pdfviewerpage(selectedPath);
-                ViewerContainer.Content = viewer;
+
+                MessageBox.Show("Step 4");
+
+                main.MainContent.Content = viewer;
             }
         }
 

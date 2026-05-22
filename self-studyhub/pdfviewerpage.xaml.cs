@@ -18,16 +18,33 @@ namespace self_studyhub.Pages
         public pdfviewerpage(string pdfPath)
         {
             InitializeComponent();
-            originalPath = pdfPath;
+            try
+            {
+                originalPath = pdfPath;
 
-            editedPath = System.IO.Path.Combine(
-                System.IO.Path.GetDirectoryName(originalPath),
-                System.IO.Path.GetFileNameWithoutExtension(originalPath) + "_edited.pdf"
-            );
+                if (!File.Exists(originalPath))
+                {
+                    MessageBox.Show("File not found");
+                    return;
+                }
 
-            File.Copy(originalPath, editedPath, true);
+                string folder = Path.GetDirectoryName(originalPath);
 
-            LoadPdf();
+                editedPath = Path.Combine(folder,
+                    Path.GetFileNameWithoutExtension(originalPath) + "_edited.pdf");
+
+                File.Copy(originalPath, editedPath, true);
+
+                this.Loaded += async (s, e) =>
+                {
+                    await PdfViewer.EnsureCoreWebView2Async();
+                    PdfViewer.Source = new Uri(editedPath);
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
         }
         private async void LoadPdf()
         {
