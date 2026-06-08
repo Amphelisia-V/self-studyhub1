@@ -63,7 +63,7 @@ namespace self_studyhub.Pages
             {
                 MessageBox.Show("Step 2");
 
-                var main = Application.Current.MainWindow as MainWindow;
+                var main = Window.GetWindow(this) as MainWindow;
 
                 if (main == null)
                 {

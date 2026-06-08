@@ -5,19 +5,19 @@ using System.Windows.Controls;
 using Microsoft.Win32;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Annot;
-using iText.Kernel.Geom;
 using iText.Kernel.Colors;
 
 namespace self_studyhub.Pages
 {
     public partial class pdfviewerpage : UserControl
     {
-        private string originalPath; // original PDF
-        private string editedPath;   // copy for editing
+        private string originalPath;
+        private string editedPath;
 
         public pdfviewerpage(string pdfPath)
         {
             InitializeComponent();
+
             try
             {
                 originalPath = pdfPath;
@@ -28,11 +28,12 @@ namespace self_studyhub.Pages
                     return;
                 }
 
-                string folder = Path.GetDirectoryName(originalPath);
+                string folder = Path.GetDirectoryName(originalPath) ?? "";
 
-                editedPath = Path.Combine(folder,
-                    Path.GetFileNameWithoutExtension(originalPath) + "_edited.pdf");
-
+                editedPath = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+    "temp_edited.pdf"
+);
                 File.Copy(originalPath, editedPath, true);
 
                 this.Loaded += async (s, e) =>
@@ -46,13 +47,30 @@ namespace self_studyhub.Pages
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
         private async void LoadPdf()
         {
-            await PdfViewer.EnsureCoreWebView2Async();
-            PdfViewer.Source = new Uri(editedPath, UriKind.Absolute);
-        }
+            try
+            {
+                await PdfViewer.EnsureCoreWebView2Async();
 
-        // ================= OPEN PDF =================
+                // 👉 ADD THIS EVENT
+                PdfViewer.CoreWebView2.ProcessFailed += CoreWebView2_ProcessFailed;
+
+                PdfViewer.Source = new Uri(editedPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void CoreWebView2_ProcessFailed(object sender, Microsoft.Web.WebView2.Core.CoreWebView2ProcessFailedEventArgs e)
+        {
+            MessageBox.Show("WebView2 crashed: " + e.ProcessFailedKind.ToString());
+
+            // optional recovery
+            PdfViewer.Reload();
+        }
         private async void OpenPdf_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -62,30 +80,22 @@ namespace self_studyhub.Pages
             {
                 originalPath = dialog.FileName;
 
-                // copy original to edited
-                editedPath = System.IO.Path.Combine(
-                    System.IO.Path.GetDirectoryName(originalPath),
-                    System.IO.Path.GetFileNameWithoutExtension(originalPath) + "_edited.pdf"
-                );
+                editedPath = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+    "temp_edited.pdf"
+);
 
                 File.Copy(originalPath, editedPath, true);
 
-                // initialize WebView2 and load PDF
                 await PdfViewer.EnsureCoreWebView2Async();
-                PdfViewer.Source = new Uri(editedPath);
 
-                MessageBox.Show("PDF copied and loaded!");
+                PdfViewer.Source = new Uri(editedPath);
             }
         }
-
-        // ================= HIGHLIGHT =================
+        private int currentPage = 1;
         private void Highlight_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(editedPath))
-            {
-                MessageBox.Show("Open a PDF first.");
-                return;
-            }
+            if (string.IsNullOrEmpty(editedPath)) return;
 
             string tempPath = editedPath.Replace(".pdf", "_temp.pdf");
 
@@ -93,35 +103,36 @@ namespace self_studyhub.Pages
                 new PdfReader(editedPath),
                 new PdfWriter(tempPath)))
             {
-                PdfPage page = pdfDoc.GetPage(1); // demo: always first page
+                int pageCount = pdfDoc.GetNumberOfPages();
 
-                // Rectangle for highlight (demo coordinates)
-                iText.Kernel.Geom.Rectangle rect = new iText.Kernel.Geom.Rectangle(100, 600, 200, 20);
+                int pageNumber = 1; // always safe
 
-                // create highlight annotation
-                var highlight = PdfTextMarkupAnnotation.CreateHighLight(rect, new float[] { 100, 600, 300, 600 });
-                highlight.SetColor(ColorConstants.YELLOW);
+                if (pageCount < pageNumber)
+                {
+                    MessageBox.Show("PDF has no page!");
+                    return;
+                }
+
+                var page = pdfDoc.GetPage(pageNumber);
+
+                var rect = new iText.Kernel.Geom.Rectangle(100, 600, 200, 20);
+
+                var highlight = PdfTextMarkupAnnotation.CreateHighLight(
+                    rect,
+                    new float[] { 100, 600, 300, 600 });
 
                 page.AddAnnotation(highlight);
             }
 
-            // safely replace edited file
             File.Delete(editedPath);
             File.Move(tempPath, editedPath);
 
             PdfViewer.Source = new Uri(editedPath);
-
-            MessageBox.Show("Highlight added!");
         }
 
-        // ================= ADD NOTE =================
         private void AddNote_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(editedPath))
-            {
-                MessageBox.Show("Open a PDF first.");
-                return;
-            }
+            if (string.IsNullOrEmpty(editedPath)) return;
 
             string tempPath = editedPath.Replace(".pdf", "_temp.pdf");
 
@@ -129,13 +140,10 @@ namespace self_studyhub.Pages
                 new PdfReader(editedPath),
                 new PdfWriter(tempPath)))
             {
-                PdfPage page = pdfDoc.GetPage(1); // demo: first page
+                var page = pdfDoc.GetPage(1);
+                var rect = new iText.Kernel.Geom.Rectangle(100, 550, 20, 20);
 
-                // Rectangle for sticky note
-                iText.Kernel.Geom.Rectangle rect = new iText.Kernel.Geom.Rectangle(100, 550, 20, 20);
-
-                // Explicit cast
-                PdfTextAnnotation note = (PdfTextAnnotation)new PdfTextAnnotation(rect);
+                var note = new PdfTextAnnotation(rect);
                 note.SetContents("This is my note");
                 note.Put(iText.Kernel.Pdf.PdfName.Open, iText.Kernel.Pdf.PdfBoolean.TRUE);
 
@@ -145,18 +153,13 @@ namespace self_studyhub.Pages
             File.Delete(editedPath);
             File.Move(tempPath, editedPath);
 
+
             PdfViewer.Source = new Uri(editedPath);
-            MessageBox.Show("Note added!");
         }
 
-        // ================= SAVE AS =================
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(editedPath))
-            {
-                MessageBox.Show("Nothing to save.");
-                return;
-            }
+            if (string.IsNullOrEmpty(editedPath)) return;
 
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "PDF Files (*.pdf)|*.pdf";
@@ -164,7 +167,6 @@ namespace self_studyhub.Pages
             if (dialog.ShowDialog() == true)
             {
                 File.Copy(editedPath, dialog.FileName, true);
-                MessageBox.Show("Saved Successfully!");
             }
         }
     }
