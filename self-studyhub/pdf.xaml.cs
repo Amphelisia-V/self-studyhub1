@@ -16,6 +16,7 @@ using Microsoft.Win32; // For OpenFileDialog
 using System.IO;
 using System.Diagnostics;
 using self_studyhub.Pages;
+using System.Collections.ObjectModel;
 
 namespace self_studyhub.Pages
 {
@@ -27,21 +28,24 @@ namespace self_studyhub.Pages
         public PDFPage()
         {
             InitializeComponent();
+            MessageBox.Show("PDFPage Constructor");
             // Hook up buttons
+            RecentFiles = new ObservableCollection<RecentFile>();
            
+            RecentList.ItemsSource = RecentFiles;
+
         }
 
         private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (RecentList.SelectedItem != null)
             {
-                ListBoxItem item = (ListBoxItem)RecentList.SelectedItem;
+                RecentFile file = (RecentFile)RecentList.SelectedItem;
 
-                string filename = item.Content.ToString();
-
-                string fullPath = System.IO.Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    filename);
+                string fullPath = file.FilePath;
+                //string fullPath = System.IO.Path.Combine(
+                    //AppDomain.CurrentDomain.BaseDirectory,
+                    //filename);
 
                 MainWindow main = Application.Current.MainWindow as MainWindow;
 
@@ -75,6 +79,10 @@ namespace self_studyhub.Pages
 
                 string selectedPath = openFileDialog.FileName;
 
+                AddRecentFile(selectedPath);
+
+                
+
                 pdfviewerpage viewer = new pdfviewerpage(selectedPath);
 
                 MessageBox.Show("Step 4");
@@ -82,6 +90,31 @@ namespace self_studyhub.Pages
                 main.MainContent.Content = viewer;
             }
         }
+        private void AddRecentFile(string path)
+        {
+            MessageBox.Show("AddRecentFile Called");
+            RecentFiles.Insert(0,
+        new RecentFile
+        {
+            FileName = System.IO.Path.GetFileName(path),
+            FilePath = path,
+            LastOpened = DateTime.Now
+        });
+        }
+
+        public class RecentFile
+        {
+            public string FileName { get; set; }
+            public string FilePath { get; set; }
+            public DateTime LastOpened { get; set; }
+        }
+
+        public ObservableCollection<RecentFile> RecentFiles
+        {
+            get;
+            set;
+        }
+
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
@@ -96,7 +129,7 @@ namespace self_studyhub.Pages
 
                 MessageBox.Show("Opening Last Session\nPDF: " + pdfPath + "\nPage: " + page);
 
-                //ဒီနေရာမှာ PDF viewer ကို open လုပ်နိုင်တယ်
+                // ဒီနေရာမှာ PDF viewer ကို open လုပ်နိုင်တယ်
             }
             else
             {
@@ -111,7 +144,6 @@ namespace self_studyhub.Pages
             if (File.Exists(noteFile))
             {
                 string notes = File.ReadAllText(noteFile);
-
                 MessageBox.Show(notes, "My Notes");
             }
             else
