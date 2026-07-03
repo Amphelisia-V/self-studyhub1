@@ -63,7 +63,8 @@ namespace self_studyhub.Pages
             if (!string.IsNullOrWhiteSpace(TaskNameBox.Text))
             {
                 TaskList.Items.Add(TaskNameBox.Text);
-                _total++;
+
+                _total = TaskList.Items.Count;   // Total Task Update
                 UpdateDailyGoal(_completed, _total);
 
                 TaskNameBox.Clear();
@@ -76,6 +77,13 @@ namespace self_studyhub.Pages
             if (TaskList.SelectedItem != null)
             {
                 TaskList.Items.Remove(TaskList.SelectedItem);
+
+                _total = TaskList.Items.Count;
+
+                if (_completed > _total)
+                    _completed = _total;
+
+                UpdateDailyGoal(_completed, _total);
             }
         }
 
@@ -181,7 +189,7 @@ namespace self_studyhub.Pages
         private void Task_Checked(object sender, RoutedEventArgs e)
         {
             _completed++;
-            UpdateDailyGoal(_completed, _total);
+            UpdateDailyGoal(_completed, TaskList.Items.Count);
             ShowMessage("Great Job 🎉", "Task Completed!");
         }
 
@@ -190,7 +198,8 @@ namespace self_studyhub.Pages
             if (_completed > 0)
                 _completed--;
 
-            UpdateDailyGoal(_completed, _total);
+            UpdateDailyGoal(_completed, TaskList.Items.Count);
+
             ShowMessage("Updated", "Task marked incomplete.");
         }
         private void DrawCircleProgress(double percentage)
@@ -241,7 +250,9 @@ namespace self_studyhub.Pages
         }
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateDailyGoal(3, 15);
+            _completed = 0;
+            _total = TaskList.Items.Count;
+            UpdateDailyGoal(_completed,_total);
         }
         private void UpdateXP(int currentXP, int maxXP)
         {
@@ -249,8 +260,8 @@ namespace self_studyhub.Pages
 
             double percentage = (double)currentXP / maxXP;
         }
-        private int _completed = 3;
-        private int _total = 15;
+        private int _completed = 0;
+        private int _total = 0;
 
         private void DailyGoalProgressContainer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
