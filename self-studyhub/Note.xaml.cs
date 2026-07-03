@@ -171,5 +171,17 @@ namespace self_studyhub.Pages
                 AddNoteCard(note);
             }
         }
+        public void AddNoteFromYoutube(string content)
+        {
+            Note newNote = new Note
+            {
+                Title = content.Split('\n')[0],
+                Content = content,
+                Created = DateTime.Now
+            };
+
+            notes.Add(newNote);
+            AddNoteCard(newNote);
+        }
     }
 }

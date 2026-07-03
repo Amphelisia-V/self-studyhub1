@@ -32,6 +32,7 @@ namespace self_studyhub
             InitializeComponent();
             homePage = new HomePage(userID);
             MainContent.Content = homePage;
+            youTubePage.NoteSaved += note.AddNoteFromYoutube;
             
 
         }
