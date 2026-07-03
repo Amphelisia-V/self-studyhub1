@@ -64,6 +64,22 @@ namespace self_studyhub.Pages
                     $"https://www.google.com/search?q={Uri.EscapeDataString(query)}");
             }
         }
+        private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (SearchBox.Text == "Search Google or type a URL")
+            {
+                SearchBox.Text = "";
+                SearchBox.Foreground = Brushes.White;
+            }
+        }
 
+        private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(SearchBox.Text))
+            {
+                SearchBox.Text = "Search Google or type a URL";
+                SearchBox.Foreground = Brushes.Gray;
+            }
+        }
     }
 }
