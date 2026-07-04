@@ -17,59 +17,36 @@ namespace self_studyhub.Pages
         public pdfviewerpage(string pdfPath)
         {
             InitializeComponent();
+            MessageBox.Show("Viewer Constructor");
 
-            try
+
+            originalPath = pdfPath;
+
+            if (!File.Exists(originalPath))
             {
-                originalPath = pdfPath;
-
-                if (!File.Exists(originalPath))
-                {
-                    MessageBox.Show("File not found");
-                    return;
-                }
-
-                string folder = Path.GetDirectoryName(originalPath) ?? "";
-
-                editedPath = Path.Combine(
-    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-    "temp_edited.pdf"
-);
-                File.Copy(originalPath, editedPath, true);
-
-                this.Loaded += async (s, e) =>
-                {
-                    await PdfViewer.EnsureCoreWebView2Async();
-                    PdfViewer.Source = new Uri(editedPath);
-                };
+                MessageBox.Show("File not found");
+                return;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
+
+            editedPath = Path.Combine(
+     Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+     $"temp_{Guid.NewGuid()}.pdf"
+             );
+
+            File.Copy(originalPath, editedPath, true);
+
+            Loaded += Pdfviewerpage_Loaded;
         }
-
-        private async void LoadPdf()
+        private bool isLoaded = false;
+        private async void Pdfviewerpage_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                await PdfViewer.EnsureCoreWebView2Async();
+            if (isLoaded) return;
+            isLoaded = true;
 
-                // 👉 ADD THIS EVENT
-                PdfViewer.CoreWebView2.ProcessFailed += CoreWebView2_ProcessFailed;
+            await PdfViewer.EnsureCoreWebView2Async();
 
-                PdfViewer.Source = new Uri(editedPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-        private void CoreWebView2_ProcessFailed(object sender, Microsoft.Web.WebView2.Core.CoreWebView2ProcessFailedEventArgs e)
-        {
-            MessageBox.Show("WebView2 crashed: " + e.ProcessFailedKind.ToString());
-
-            // optional recovery
-            PdfViewer.Reload();
+            PdfViewer.Source = new Uri(editedPath);
+            MessageBox.Show("Viewer Loaded");
         }
         private async void OpenPdf_Click(object sender, RoutedEventArgs e)
         {

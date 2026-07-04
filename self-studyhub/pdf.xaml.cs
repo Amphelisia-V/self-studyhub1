@@ -38,22 +38,31 @@ namespace self_studyhub.Pages
 
         private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (RecentList.SelectedItem != null)
+            MessageBox.Show("SelectionChanged Event");
+            if (e.AddedItems.Count == 0)
+                return;
+
+            var file = e.AddedItems[0] as RecentFile;
+            MessageBox.Show(file.FilePath);
+            MessageBox.Show("Before Viewer");
+            if (file == null) return;
+
+            string fullPath = file.FilePath;
+
+            if (!File.Exists(fullPath))
             {
-                RecentFile file = (RecentFile)RecentList.SelectedItem;
-
-                string fullPath = file.FilePath;
-                //string fullPath = System.IO.Path.Combine(
-                    //AppDomain.CurrentDomain.BaseDirectory,
-                    //filename);
-
-                MainWindow main = Application.Current.MainWindow as MainWindow;
-
-                if (main != null)
-                {
-                    main.MainContent.Content = new pdfviewerpage(fullPath);
-                }
+                MessageBox.Show("File not found: " + fullPath);
+                return;
             }
+
+            var main = Application.Current.MainWindow as MainWindow;
+
+            if (main != null)
+            {
+                main.MainContent.Content = new pdfviewerpage(fullPath);
+                MessageBox.Show("After Viewer");
+            }
+           
         }
 
         private void OpenPDFButton_Click(object sender, RoutedEventArgs e)
@@ -109,11 +118,8 @@ namespace self_studyhub.Pages
             public DateTime LastOpened { get; set; }
         }
 
-        public ObservableCollection<RecentFile> RecentFiles
-        {
-            get;
-            set;
-        }
+        public ObservableCollection<RecentFile> RecentFiles { get; set; }
+     
 
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
