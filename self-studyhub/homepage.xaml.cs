@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using System.Data.SqlClient;
+using self_studyhub.Models;
 
 namespace self_studyhub.Pages
 {
@@ -37,7 +39,8 @@ namespace self_studyhub.Pages
             DrawCircleProgress(0.6);
             UpdateDailyGoal(3, 15);
             Loaded += HomePage_Loaded;
-            
+            this.userId = userId;
+            LoadTasks();
         
 
         timeLeft = TimeSpan.FromMinutes(25);
@@ -60,16 +63,28 @@ namespace self_studyhub.Pages
 
         private void SaveTask(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(TaskNameBox.Text))
+            if (string.IsNullOrWhiteSpace(TaskNameBox.Text))
+                return;
+
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
             {
-                TaskList.Items.Add(TaskNameBox.Text);
+                con.Open();
 
-                _total = TaskList.Items.Count;   // Total Task Update
-                UpdateDailyGoal(_completed, _total);
+                string query = @"INSERT INTO Tasks_tb(UserId, TaskName, IsCompleted)
+                         VALUES(@UserId, @TaskName, 0)";
 
-                TaskNameBox.Clear();
-                TaskModalOverlay.Visibility = Visibility.Collapsed;
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@TaskName", TaskNameBox.Text);
+
+                cmd.ExecuteNonQuery();
             }
+
+            TaskNameBox.Clear();
+            TaskModalOverlay.Visibility = Visibility.Collapsed;
+
+            
+            LoadTasks();
         }
 
         private void DeleteTask(object sender, RoutedEventArgs e)
@@ -188,18 +203,43 @@ namespace self_studyhub.Pages
         }
         private void Task_Checked(object sender, RoutedEventArgs e)
         {
-            _completed++;
-            UpdateDailyGoal(_completed, TaskList.Items.Count);
+            CheckBox checkBox = sender as CheckBox;
+            TaskItem task = checkBox.DataContext as TaskItem;
+
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                string query = "UPDATE Tasks_tb SET IsCompleted = 1 WHERE TaskId = @TaskId";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@TaskId", task.TaskId);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            LoadTasks();
             ShowMessage("Great Job 🎉", "Task Completed!");
         }
 
         private void Task_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (_completed > 0)
-                _completed--;
+            CheckBox checkBox = sender as CheckBox;
+            TaskItem task = checkBox.DataContext as TaskItem;
 
-            UpdateDailyGoal(_completed, TaskList.Items.Count);
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
 
+                string query = "UPDATE Tasks_tb SET IsCompleted = 0 WHERE TaskId = @TaskId";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@TaskId", task.TaskId);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            LoadTasks();
             ShowMessage("Updated", "Task marked incomplete.");
         }
         private void DrawCircleProgress(double percentage)
@@ -250,16 +290,9 @@ namespace self_studyhub.Pages
         }
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            _completed = 0;
-            _total = TaskList.Items.Count;
-            UpdateDailyGoal(_completed,_total);
+            LoadTasks();
         }
-        private void UpdateXP(int currentXP, int maxXP)
-        {
-            if (maxXP == 0) return;
-
-            double percentage = (double)currentXP / maxXP;
-        }
+        
         private int _completed = 0;
         private int _total = 0;
 
@@ -278,9 +311,43 @@ namespace self_studyhub.Pages
         {
             CustomMessage.Visibility = Visibility.Collapsed;
         }
-       
+        private List<TaskItem> tasks = new List<TaskItem>();
+        private void LoadTasks()
+        {
+            tasks.Clear();
 
-        
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                string query = "SELECT * FROM Tasks_tb WHERE UserId=@UserId";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    tasks.Add(new TaskItem
+                    {
+                        TaskId = Convert.ToInt32(reader["TaskId"]),
+                        UserId = Convert.ToInt32(reader["UserId"]),
+                        TaskName = reader["TaskName"].ToString(),
+                        IsCompleted = Convert.ToBoolean(reader["IsCompleted"])
+                    });
+                }
+            }
+
+            TaskList.ItemsSource = null;
+            TaskList.ItemsSource = tasks;
+
+            _total = tasks.Count;
+            _completed = tasks.Count(t => t.IsCompleted);
+
+            UpdateDailyGoal(_completed, _total);
+        }
+
     }
 }
 
