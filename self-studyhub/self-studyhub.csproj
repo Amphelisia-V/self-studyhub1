@@ -176,6 +176,7 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\DatabaseHelper.cs" />
+    <Compile Include="Models\Note.cs" />
     <Compile Include="Models\TaksItem.cs" />
     <Compile Include="note.cs">
       <SubType>UserControl</SubType>

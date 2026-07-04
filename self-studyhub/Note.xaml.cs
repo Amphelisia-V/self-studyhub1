@@ -13,6 +13,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Data.SqlClient;
+using self_studyhub.Models;
 
 namespace self_studyhub.Pages
 {
@@ -24,6 +26,7 @@ namespace self_studyhub.Pages
         public NotePage()
         {
             InitializeComponent();
+            LoadNotes();
 
         }
         private void NewNote_Click(object sender, RoutedEventArgs e)
@@ -64,6 +67,7 @@ namespace self_studyhub.Pages
         }
         public class Note
         {
+            public int NoteId { get; set; }
             public string Title { get; set; }
             public string Content { get; set; }
             public DateTime Created { get; set; }
@@ -86,9 +90,23 @@ namespace self_studyhub.Pages
                     Content = NoteContentBox.Text,
                     Created = DateTime.Now
                 };
+                using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+                {
+                    con.Open();
 
-                notes.Add(newNote);
-                AddNoteCard(newNote);
+                    SqlCommand cmd = new SqlCommand(
+                        "INSERT INTO Notes_tb(Title,Content,Created) VALUES(@Title,@Content,@Created)",
+                        con);
+
+                    cmd.Parameters.AddWithValue("@Title", newNote.Title);
+                    cmd.Parameters.AddWithValue("@Content", newNote.Content);
+                    cmd.Parameters.AddWithValue("@Created", newNote.Created);
+
+                    cmd.ExecuteNonQuery();
+                }
+
+                LoadNotes();
+                
             }
             else
             {
@@ -100,6 +118,7 @@ namespace self_studyhub.Pages
             }
 
             CloseEditor_Click(null, null);
+
         }
         private void AddNoteCard(Note note)
         {
@@ -158,6 +177,7 @@ namespace self_studyhub.Pages
                 };
 
                 EditorTransform.BeginAnimation(TranslateTransform.XProperty, slideIn);
+
             };
 
             NotesContainer.Children.Add(card);
@@ -182,6 +202,35 @@ namespace self_studyhub.Pages
 
             notes.Add(newNote);
             AddNoteCard(newNote);
+        }
+        private void LoadNotes()
+        {
+            notes.Clear();
+            NotesContainer.Children.Clear();
+
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT * FROM Notes_tb ORDER BY Created DESC", con);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Note note = new Note
+                    {
+                        NoteId = Convert.ToInt32(reader["NoteId"]),
+                        Title = reader["Title"].ToString(),
+                        Content = reader["Content"].ToString(),
+                        Created = Convert.ToDateTime(reader["Created"])
+                    };
+
+                    notes.Add(note);
+                    AddNoteCard(note);
+                }
+            }
         }
     }
 }
