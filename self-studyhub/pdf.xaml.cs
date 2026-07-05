@@ -31,6 +31,7 @@ namespace self_studyhub.Pages
             MessageBox.Show("PDFPage Constructor");
 
             // Hook up buttons
+
             RecentFiles = new ObservableCollection<RecentFile>();
            
             RecentList.ItemsSource = RecentFiles;
@@ -39,31 +40,26 @@ namespace self_studyhub.Pages
 
         private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MessageBox.Show("SelectionChanged Event");
-            if (e.AddedItems.Count == 0)
-                return;
+            var file = RecentList.SelectedItem as RecentFile;
 
-            var file = e.AddedItems[0] as RecentFile;
-            MessageBox.Show(file.FilePath);
-            MessageBox.Show("Before Viewer");
-            if (file == null) return;
+            if (file == null)
+                return;
 
             string fullPath = file.FilePath;
 
             if (!File.Exists(fullPath))
             {
-                MessageBox.Show("File not found: " + fullPath);
+                MessageBox.Show("File not found");
                 return;
             }
 
-            var main = Application.Current.MainWindow as MainWindow;
+            var main = Window.GetWindow(this) as MainWindow;
 
             if (main != null)
             {
                 main.MainContent.Content = new pdfviewerpage(fullPath);
-                MessageBox.Show("After Viewer");
             }
-           
+
         }
 
         private void OpenPDFButton_Click(object sender, RoutedEventArgs e)
