@@ -29,6 +29,7 @@ namespace self_studyhub.Pages
         {
             InitializeComponent();
             MessageBox.Show("PDFPage Constructor");
+
             // Hook up buttons
             RecentFiles = new ObservableCollection<RecentFile>();
            
