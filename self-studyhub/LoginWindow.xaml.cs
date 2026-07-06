@@ -39,11 +39,11 @@ namespace self_studyhub
 
             try
             {
-                using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-8BBV09R\\MSSQLSERVER01;Initial Catalog=StudyControlDB;Integrated Security=True;Encrypt=True;TrustServerCertificate=True"))
+                using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-19080AH\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
                 {
                     con.Open();
 
-                    string query = "SELECT id, username, email FROM Users_tb WHERE email=@Email AND password=@password";
+                    string query = "SELECT UserId, username, email FROM Users_tb WHERE email=@Email AND password=@password";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("@Email", email);
                     cmd.Parameters.AddWithValue("@password", password);
@@ -52,7 +52,7 @@ namespace self_studyhub
 
                     if (reader.Read())
                     {
-                        int userId =Convert.ToInt32(reader["id"]);
+                        int userId =Convert.ToInt32(reader["UserId"]);
                         string userName = reader["username"].ToString();
                         string emailFromDb = reader["email"].ToString(); // rename to avoid conflict
 
