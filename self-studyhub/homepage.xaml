@@ -341,12 +341,14 @@ Margin="0,15,0,0">
                          Foreground="White">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding TaskName}"
+                            <CheckBox Style="{x:Null}"
+                            Content="{Binding TaskName}"
                             IsChecked="{Binding IsCompleted}"
                       FontSize="14"
                       Margin="5"
                       Cursor="Hand"
                       Foreground="White"
+                      BorderBrush="White"
                       Checked="Task_Checked"
                       Unchecked="Task_Unchecked"/>
                         </DataTemplate>

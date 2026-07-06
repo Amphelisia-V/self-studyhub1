@@ -199,7 +199,7 @@ namespace self_studyhub.Pages
             // 🔥 OPTIONAL: Circle Progress (if you use DrawCircleProgress)
             double totalSeconds = focusMinutes*60; // 25 min
             double percent = timeLeft.TotalSeconds / totalSeconds;
-            DrawCircleProgress(percent);
+           
         }
         private void Task_Checked(object sender, RoutedEventArgs e)
         {

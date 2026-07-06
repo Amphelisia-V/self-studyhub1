@@ -5,7 +5,8 @@
         xmlns:materialDesignControls="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
 
              Background="#121212">
-    <Grid >
+    <materialDesign:DialogHost Identifier="RootDialog">
+        <Grid >
         <Grid.Background>
             <ImageBrush ImageSource="/Assests/background2.jpg"
                     Stretch="UniformToFill"
@@ -63,15 +64,17 @@
                     Padding="15,0" Grid.ColumnSpan="2">
                 <StackPanel Orientation="Horizontal"
 Margin="10">
-                    <TextBox 
-         materialDesign:HintAssist.Hint="Search your notes"
-         Background="Transparent"
-         BorderThickness="0"
-         Foreground="White"
-         FontSize="16"
-         VerticalContentAlignment="Center"/>
+                            <TextBox
+    x:Name="SearchBox"
+    materialDesign:HintAssist.Hint="Search your notes"
+    Background="Transparent"
+    BorderThickness="0"
+    Foreground="White"
+    FontSize="16"
+    VerticalContentAlignment="Center"
+    TextChanged="SearchBox_TextChanged"/>
 
-                </StackPanel>
+                        </StackPanel>
             </Border>
             <Button Grid.Column="2"
                     Content="+ New Note" Click="NewNote_Click" 
@@ -97,10 +100,12 @@ Margin="10">
                 <TextBlock Text="All Notes" Foreground="#4F7DF3" FontWeight="SemiBold"/>
             </Border>
 
-            <ComboBox Width="200" Height="36" SelectedIndex="0" Foreground="White">
+            <ComboBox x:Name="SortBox" Width="200" Height="36" SelectedIndex="0" Foreground="White" SelectionChanged="SortBox_SelectionChanged">
                 <ComboBoxItem Content="Recently Added"
                              Foreground="Black" />
-            </ComboBox>
+                        <ComboBoxItem Content="Oldest First"
+             Foreground="Black" />
+                    </ComboBox>
 
             <TextBlock Text="Sort by: Recently Added" VerticalAlignment="Center" Margin="15,0,0,0" Foreground="Gray"/>
         </StackPanel>
@@ -174,7 +179,8 @@ Margin="10">
                          FontSize="20"
                          FontWeight="Bold"
                          Margin="0,20,0,10"
-                         Text="Untitled Note"/>
+                         Text="Untitled Note"
+                         GotFocus="NoteTitleBox_GotFocus"/>
 
                         <!-- Content -->
                         <TextBox x:Name="NoteContentBox"
@@ -204,4 +210,5 @@ Margin="10">
         </Grid>
         </Grid>
     </Grid>
+    </materialDesign:DialogHost>
 </UserControl>
