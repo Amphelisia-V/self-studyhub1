@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MaterialDesignThemes.Wpf;
 
 namespace self_studyhub.Pages
 {
@@ -27,6 +28,7 @@ namespace self_studyhub.Pages
         public YouTubePage()
         {
             InitializeComponent();
+            SaveSnackbar.MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(3));
             
             // WebView ကို စတင်ပွင့်ဖို့ ခေါ်ထားရပါမယ်
             InitializeWebView();
@@ -66,6 +68,23 @@ namespace self_studyhub.Pages
                 MessageBox.Show("please wait a second");
             }
         }
+        public event Action<string> NoteSaved;
+        private void SaveNote_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (string.IsNullOrWhiteSpace(NoteBox.Text))
+            {
+                MessageBox.Show("Please enter a note.");
+                return;
+            }
+
+            NoteSaved?.Invoke(NoteBox.Text);
+
+            SaveSnackbar.MessageQueue?.Enqueue("✅ Note saved successfully!");
+
+            NoteBox.Clear();
+        }
+
     }
 
 }

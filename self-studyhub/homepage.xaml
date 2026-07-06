@@ -165,72 +165,77 @@
         <!-- ================= FOCUS TIMER ================= -->
         <Border Grid.Row="3"
         Grid.Column="1"
-         Background="#1E1E1E"
+        Background="#141821"
         CornerRadius="15"
-        Padding="30"
+        Padding="20"
         Width="260"
-        Height="180"
-               Margin="0,0,100,0" >
-
+        Height="220"
+        Margin="0,0,100,0">
 
             <StackPanel HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-
-
-
-
+                VerticalAlignment="Top">
                 <!-- Title -->
                 <TextBlock Text="Focus Timer"
                    Foreground="AntiqueWhite"
-                   FontSize="20"
-                   HorizontalAlignment="Center"
-                 />
+                   FontSize="14"
+                   HorizontalAlignment="Center"/>
 
-                <!-- Big Timer -->
+                <!-- Input Row -->
+                <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+
+                    <TextBox x:Name="TimeInput"
+                     Text="25"
+                     Width="60"
+                     Height="28"
+                     Background="#2A2F3A"
+                     Foreground="White"
+                     BorderThickness="0"
+                     HorizontalContentAlignment="Center"
+                     FontWeight="Bold"/>
+
+                    <TextBlock Text=" min"
+                       Foreground="Gray"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"/>
+                </StackPanel>
+
+                <!-- Timer Display -->
                 <TextBlock x:Name="TimerText"
                    Text="25:00"
-                   
-                   FontSize="50"
+                   FontSize="30"
                    FontWeight="Bold"
                    Foreground="White"
-                   HorizontalAlignment="Center"
-                   TextWrapping="NoWrap"
-                   Width="auto"/>
+                   HorizontalAlignment="Center"/>
 
-                <!--time button-->
+                <!-- Buttons -->
                 <StackPanel Orientation="Horizontal"
-                   HorizontalAlignment="Center">
-                    <!-- Start Button -->
+                    HorizontalAlignment="Center"
+                    Margin="0,10,0,0">
 
-                <Button x:Name="StartButton"
-                Content="START"
-                Width="80"
-                Height="35"
-                FontSize="12"
-                Margin="0,0,10,0"
-                FontWeight="Bold"
-                Background="#FF5A5F"
-                Foreground="White"
-                BorderThickness="0"
-                Click="StartTimer"
-                Cursor="Hand"
-                />
+                    <Button x:Name="StartButton"
+                    Content="START"
+                    Width="80"
+                    Height="30"
+                    Margin="0,0,10,0"
+                    Background="#FF5A5F"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="StartTimer"
+                    FontSize="10"/>
 
-                <!-- reset Button -->
-                <Button x:Name="ResetButton"
-Content="RESET"
-Width="80"
-Height="35"
-FontSize="12"
-FontWeight="Bold"
-Background="#FF5A5F"
-Foreground="White"
-BorderThickness="0"
-Click="ResetTimer"
-Cursor="Hand"
-/>
+                    <Button x:Name="ResetButton"
+                    Content="RESET"
+                    Width="80"
+                    Height="30"
+                    Background="#FF5A5F"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="ResetTimer"
+                    FontSize="11"/>
+                </StackPanel>
             </StackPanel>
-            </StackPanel>
+
         </Border>
         <!-- ================= SKILL PROGRESS ================= -->
         <Border Grid.Row="2"
@@ -336,7 +341,8 @@ Margin="0,15,0,0">
                          Foreground="White">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding}"
+                            <CheckBox Content="{Binding TaskName}"
+                            IsChecked="{Binding IsCompleted}"
                       FontSize="14"
                       Margin="5"
                       Cursor="Hand"

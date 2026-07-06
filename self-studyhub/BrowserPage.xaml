@@ -36,8 +36,10 @@
                          Foreground="White"
                          FontSize="16"
                          VerticalContentAlignment="Center"
-                         KeyDown="SearchBox_KeyDown"
-                         Text="Search Google or type a URL"/>
+                           Text="Search Google or type a URL"
+         GotFocus="SearchBox_GotFocus"
+         LostFocus="SearchBox_LostFocus"
+         KeyDown="SearchBox_KeyDown"/>
             </Border>
         </StackPanel>
 

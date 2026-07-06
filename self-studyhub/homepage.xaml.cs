@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using System.Data.SqlClient;
+using self_studyhub.Models;
 
 namespace self_studyhub.Pages
 {
@@ -28,6 +30,7 @@ namespace self_studyhub.Pages
         private bool isRunning = false;
 
         private int userId;
+        private int focusMinutes = 25;
 
         public HomePage(int userId)
         {
@@ -36,7 +39,8 @@ namespace self_studyhub.Pages
             DrawCircleProgress(0.6);
             UpdateDailyGoal(3, 15);
             Loaded += HomePage_Loaded;
-            
+            this.userId = userId;
+            LoadTasks();
         
 
         timeLeft = TimeSpan.FromMinutes(25);
@@ -59,15 +63,28 @@ namespace self_studyhub.Pages
 
         private void SaveTask(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(TaskNameBox.Text))
-            {
-                TaskList.Items.Add(TaskNameBox.Text);
-                _total++;
-                UpdateDailyGoal(_completed, _total);
+            if (string.IsNullOrWhiteSpace(TaskNameBox.Text))
+                return;
 
-                TaskNameBox.Clear();
-                TaskModalOverlay.Visibility = Visibility.Collapsed;
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                string query = @"INSERT INTO Tasks_tb(UserId, Title, IsCompleted)
+                         VALUES(@UserId, @Title, 0)";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@Title", TaskNameBox.Text);
+
+                cmd.ExecuteNonQuery();
             }
+
+            TaskNameBox.Clear();
+            TaskModalOverlay.Visibility = Visibility.Collapsed;
+
+            
+            LoadTasks();
         }
 
         private void DeleteTask(object sender, RoutedEventArgs e)
@@ -75,6 +92,13 @@ namespace self_studyhub.Pages
             if (TaskList.SelectedItem != null)
             {
                 TaskList.Items.Remove(TaskList.SelectedItem);
+
+                _total = TaskList.Items.Count;
+
+                if (_completed > _total)
+                    _completed = _total;
+
+                UpdateDailyGoal(_completed, _total);
             }
         }
 
@@ -112,8 +136,23 @@ namespace self_studyhub.Pages
 
         private void StartTimer(object sender, RoutedEventArgs e)
         {
-            if (!timer.IsEnabled)
+            if (!isRunning)
             {
+                // ⬇ Read user input
+                if (!int.TryParse(TimeInput.Text, out focusMinutes) || focusMinutes <= 0)
+                {
+                    MessageBox.Show("Enter valid minutes!");
+                    return;
+                }
+                if(focusMinutes>300)
+               {
+               MessageBox.Show("maximum is 300 minutes");
+               return;
+               }
+
+                // ⬇ Set time based on input
+                timeLeft = TimeSpan.FromMinutes(focusMinutes);
+
                 timer.Start();
                 StartButton.Content = "PAUSE";
                 isRunning = true;
@@ -124,12 +163,15 @@ namespace self_studyhub.Pages
                 StartButton.Content = "RESUME";
                 isRunning = false;
             }
+
+            UpdateTimerUI();
         }
 
         private void ResetTimer(object sender, RoutedEventArgs e)
         {
             timer.Stop();
-            timeLeft = TimeSpan.FromMinutes(25);
+
+            timeLeft = TimeSpan.FromMinutes(focusMinutes);
 
             UpdateTimerUI();
 
@@ -142,7 +184,7 @@ namespace self_studyhub.Pages
 
         private void UpdateTimerUI()
         {
-            TimerText.Text = timeLeft.ToString(@"mm\:ss");
+            TimerText.Text = timeLeft.ToString(@"hh\:mm\:ss");
 
             // 🔴 Last 5 min color change
             if (timeLeft.TotalMinutes <= 5)
@@ -155,23 +197,49 @@ namespace self_studyhub.Pages
             }
 
             // 🔥 OPTIONAL: Circle Progress (if you use DrawCircleProgress)
-            double totalSeconds = 1500; // 25 min
+            double totalSeconds = focusMinutes*60; // 25 min
             double percent = timeLeft.TotalSeconds / totalSeconds;
             DrawCircleProgress(percent);
         }
         private void Task_Checked(object sender, RoutedEventArgs e)
         {
-            _completed++;
-            UpdateDailyGoal(_completed, _total);
+            CheckBox checkBox = sender as CheckBox;
+            TaskItem task = checkBox.DataContext as TaskItem;
+
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                string query = "UPDATE Tasks_tb SET IsCompleted = 1 WHERE TaskId = @TaskId";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@TaskId", task.TaskId);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            LoadTasks();
             ShowMessage("Great Job 🎉", "Task Completed!");
         }
 
         private void Task_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (_completed > 0)
-                _completed--;
+            CheckBox checkBox = sender as CheckBox;
+            TaskItem task = checkBox.DataContext as TaskItem;
 
-            UpdateDailyGoal(_completed, _total);
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                string query = "UPDATE Tasks_tb SET IsCompleted = 0 WHERE TaskId = @TaskId";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@TaskId", task.TaskId);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            LoadTasks();
             ShowMessage("Updated", "Task marked incomplete.");
         }
         private void DrawCircleProgress(double percentage)
@@ -222,16 +290,11 @@ namespace self_studyhub.Pages
         }
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateDailyGoal(3, 15);
+            LoadTasks();
         }
-        private void UpdateXP(int currentXP, int maxXP)
-        {
-            if (maxXP == 0) return;
-
-            double percentage = (double)currentXP / maxXP;
-        }
-        private int _completed = 3;
-        private int _total = 15;
+        
+        private int _completed = 0;
+        private int _total = 0;
 
         private void DailyGoalProgressContainer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -248,9 +311,43 @@ namespace self_studyhub.Pages
         {
             CustomMessage.Visibility = Visibility.Collapsed;
         }
-       
+        private List<TaskItem> tasks = new List<TaskItem>();
+        private void LoadTasks()
+        {
+            tasks.Clear();
 
-        
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                string query = "SELECT * FROM Tasks_tb WHERE UserId=@UserId";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    tasks.Add(new TaskItem
+                    {
+                        TaskId = Convert.ToInt32(reader["TaskId"]),
+                        UserId = Convert.ToInt32(reader["UserId"]),
+                        Title = reader["Title"].ToString(),
+                        IsCompleted = Convert.ToBoolean(reader["IsCompleted"])
+                    });
+                }
+            }
+
+            TaskList.ItemsSource = null;
+            TaskList.ItemsSource = tasks;
+
+            _total = tasks.Count;
+            _completed = tasks.Count(t => t.IsCompleted);
+
+            UpdateDailyGoal(_completed, _total);
+        }
+
     }
 }
 

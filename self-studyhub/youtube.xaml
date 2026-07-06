@@ -129,7 +129,8 @@ Margin="10">
                     <Button Content="Save Note"
                 Width="100"
                 HorizontalAlignment="Right"
-                >
+                Click="SaveNote_Click"
+                        >
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#FF6A88" Offset="0"/>
@@ -161,7 +162,14 @@ Margin="10">
                 </StackPanel>
             </Border>
         </Grid>
-
+        <materialDesign:Snackbar
+    x:Name="SaveSnackbar"
+    HorizontalAlignment="Center"
+    VerticalAlignment="Bottom"
+    Margin="20"
+    Background="CadetBlue"
+    Foreground="White"
+    MessageQueue="{materialDesign:MessageQueue}"/>
     </Grid>
 
 
