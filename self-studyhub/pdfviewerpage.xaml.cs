@@ -17,7 +17,7 @@ namespace self_studyhub.Pages
         public pdfviewerpage(string pdfPath)
         {
             InitializeComponent();
-            MessageBox.Show("Viewer Constructor");
+           
 
 
             originalPath = pdfPath;
@@ -46,7 +46,7 @@ namespace self_studyhub.Pages
             await PdfViewer.EnsureCoreWebView2Async();
 
             PdfViewer.Source = new Uri(editedPath);
-            MessageBox.Show("Viewer Loaded");
+            
         }
         private async void OpenPdf_Click(object sender, RoutedEventArgs e)
         {

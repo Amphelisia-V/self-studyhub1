@@ -28,7 +28,7 @@ namespace self_studyhub.Pages
         public PDFPage()
         {
             InitializeComponent();
-            MessageBox.Show("PDFPage Constructor");
+            
             
             // Hook up buttons
 
@@ -64,15 +64,13 @@ namespace self_studyhub.Pages
 
         private void OpenPDFButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Step 1");
-
+     
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "PDF files (*.pdf)|*.pdf";
 
             if (openFileDialog.ShowDialog() == true)
             {
-                MessageBox.Show("Step 2");
-
+ 
                 var main = Window.GetWindow(this) as MainWindow;
 
                 if (main == null)
@@ -81,24 +79,18 @@ namespace self_studyhub.Pages
                     return;
                 }
 
-                MessageBox.Show("Step 3");
-
                 string selectedPath = openFileDialog.FileName;
 
                 AddRecentFile(selectedPath);
 
-                
-
                 pdfviewerpage viewer = new pdfviewerpage(selectedPath);
-
-                MessageBox.Show("Step 4");
 
                 main.MainContent.Content = viewer;
             }
         }
         private void AddRecentFile(string path)
         {
-            MessageBox.Show("AddRecentFile Called");
+           
             RecentFiles.Insert(0,
         new RecentFile
         {
@@ -153,6 +145,13 @@ namespace self_studyhub.Pages
             {
                 MessageBox.Show("No notes found.");
             }
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = SearchBox.Text;
+
+            MessageBox.Show("You search: " + keyword);
         }
     }
 
