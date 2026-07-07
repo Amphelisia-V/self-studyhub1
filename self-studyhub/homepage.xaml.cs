@@ -70,12 +70,12 @@ namespace self_studyhub.Pages
             {
                 con.Open();
 
-                string query = @"INSERT INTO Tasks_tb(UserId, TaskName, IsCompleted)
-                         VALUES(@UserId, @TaskName, 0)";
+                string query = @"INSERT INTO Tasks_tb(UserId, Title, IsCompleted)
+                         VALUES(@UserId, @Title, 0)";
 
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("@UserId", userId);
-                cmd.Parameters.AddWithValue("@TaskName", TaskNameBox.Text);
+                cmd.Parameters.AddWithValue("@Title", TaskNameBox.Text);
 
                 cmd.ExecuteNonQuery();
             }
@@ -333,7 +333,7 @@ namespace self_studyhub.Pages
                     {
                         TaskId = Convert.ToInt32(reader["TaskId"]),
                         UserId = Convert.ToInt32(reader["UserId"]),
-                        TaskName = reader["TaskName"].ToString(),
+                        Title = reader["Title"].ToString(),
                         IsCompleted = Convert.ToBoolean(reader["IsCompleted"])
                     });
                 }
