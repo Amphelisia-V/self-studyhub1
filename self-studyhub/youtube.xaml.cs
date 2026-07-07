@@ -1,7 +1,10 @@
-﻿using Microsoft.Web.WebView2.WinForms;
+﻿using MaterialDesignThemes.Wpf;
+using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Wpf;
+using self_studyhub.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
@@ -15,7 +18,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MaterialDesignThemes.Wpf;
 
 namespace self_studyhub.Pages
 {
@@ -68,9 +70,14 @@ namespace self_studyhub.Pages
                 MessageBox.Show("please wait a second");
             }
         }
-        public event Action<string> NoteSaved;
+        public event Action<string,string> NoteSaved;
         private void SaveNote_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(TitleBox.Text))
+            {
+                MessageBox.Show("Please enter a note title.");
+                return;
+            }
 
             if (string.IsNullOrWhiteSpace(NoteBox.Text))
             {
@@ -78,12 +85,28 @@ namespace self_studyhub.Pages
                 return;
             }
 
-            NoteSaved?.Invoke(NoteBox.Text);
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                SqlCommand cmd = new SqlCommand(
+                    "INSERT INTO Notes_tb (Title, Content, Created) VALUES (@Title, @Content, @Created)", con);
+
+                cmd.Parameters.AddWithValue("@Title", TitleBox.Text);
+                cmd.Parameters.AddWithValue("@Content", NoteBox.Text);
+                cmd.Parameters.AddWithValue("@Created", DateTime.Now);
+
+                cmd.ExecuteNonQuery();
+            }
 
             SaveSnackbar.MessageQueue?.Enqueue("✅ Note saved successfully!");
 
+            TitleBox.Clear();
             NoteBox.Clear();
+            OnNoteSaved?.Invoke();
         }
+        public static event Action OnNoteSaved;
+       
 
     }
 
