@@ -162,9 +162,28 @@ Margin="10">
                    Foreground="White"
                    FontSize="20"
                    FontWeight="Bold"/>
+                            <ListBox x:Name="RecentList"
+         Background="#141821"
+         Foreground="White"
+         SelectionChanged="RecentList_SelectionChanged">
 
-                            <ListBox x:Name="RecentVideoList"
-                 Background="Transparent">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+
+                                        <StackPanel Margin="10">
+
+                                            <TextBlock Text="{Binding Title}"
+                           Foreground="White"
+                           FontSize="16"/>
+
+                                            <TextBlock Text="{Binding WatchedDate}"
+                           Foreground="Gray"
+                           FontSize="12"/>
+
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
 
                             </ListBox>
 
