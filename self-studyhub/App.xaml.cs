@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Syncfusion.Licensing;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,11 @@ namespace self_studyhub
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            SyncfusionLicenseProvider.RegisterLicense(
+                "YOUR LICENSE KEY"
+            );
+        }
     }
 }

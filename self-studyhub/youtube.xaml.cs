@@ -4,6 +4,7 @@ using Microsoft.Web.WebView2.Wpf;
 using self_studyhub.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
@@ -18,6 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static self_studyhub.Pages.PDFPage;
+using System.Collections.ObjectModel;
 
 namespace self_studyhub.Pages
 {
@@ -26,12 +29,15 @@ namespace self_studyhub.Pages
     /// </summary>
     public partial class YouTubePage : UserControl
     {
-        
+        public ObservableCollection<RecentVideo> RecentVideos { get; set; }
         public YouTubePage()
         {
             InitializeComponent();
             SaveSnackbar.MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(3));
-            
+            RecentVideos = new ObservableCollection<RecentVideo>();
+
+            RecentList.ItemsSource = RecentVideos;
+
             // WebView ကို စတင်ပွင့်ဖို့ ခေါ်ထားရပါမယ်
             InitializeWebView();
         }
@@ -59,15 +65,53 @@ namespace self_studyhub.Pages
                     string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1].Split('&')[0];
                     string embedUrl = $"https://www.youtube.com/embed/{videoId}";
                     VideoView.CoreWebView2.Navigate(embedUrl);
+
+                    WatchVideo("YouTube Video " + videoId, url);
                 }
                 else if (url.StartsWith("https://"))
                 {
                     VideoView.CoreWebView2.Navigate(url);
+
+                    // Add Recent Video
+                    WatchVideo(url, url);
                 }
 
             }else
             {
                 MessageBox.Show("please wait a second");
+            }
+        }
+        private void WatchVideo(string title, string url)
+        {
+            RecentVideos.Insert(0, new RecentVideo
+            {
+                Title = title,
+                VideoUrl = url,
+                WatchedDate = DateTime.Now
+            });
+        }
+        private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RecentList.SelectedItem is RecentVideo video)
+            {
+                if (VideoView != null && VideoView.CoreWebView2 != null)
+                {
+                    string url = video.VideoUrl;
+
+                    if (url.Contains("watch?v="))
+                    {
+                        string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
+                                            .Split('&')[0];
+
+                        string embedUrl = $"https://www.youtube.com/embed/{videoId}";
+
+                        VideoView.CoreWebView2.Navigate(embedUrl);
+                    }
+                    else
+                    {
+                        VideoView.CoreWebView2.Navigate(url);
+                    }
+                }
             }
         }
         public event Action<string,string> NoteSaved;
