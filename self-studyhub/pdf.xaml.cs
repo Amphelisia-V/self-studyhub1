@@ -28,12 +28,12 @@ namespace self_studyhub.Pages
         public PDFPage()
         {
             InitializeComponent();
-            
-            
-            // Hook up buttons
 
-            RecentFiles = new ObservableCollection<RecentFile>();
-           
+            if (RecentFiles == null)
+            {
+                RecentFiles = new ObservableCollection<RecentFile>();
+            }
+
             RecentList.ItemsSource = RecentFiles;
 
         }
@@ -44,8 +44,12 @@ namespace self_studyhub.Pages
 
             if (file == null)
                 return;
-
+            MessageBox.Show(
+       "Name: " + file.FileName +
+       "\nPath: " + file.FilePath
+   );
             string fullPath = file.FilePath;
+
 
             if (!File.Exists(fullPath))
             {
@@ -107,8 +111,7 @@ namespace self_studyhub.Pages
             public DateTime LastOpened { get; set; }
         }
 
-        public ObservableCollection<RecentFile> RecentFiles { get; set; }
-     
+        public static ObservableCollection<RecentFile> RecentFiles { get; set; }
 
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
@@ -149,9 +152,19 @@ namespace self_studyhub.Pages
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string keyword = SearchBox.Text;
+            string keyword = SearchBox.Text?.ToLower() ?? "";
 
-            MessageBox.Show("You search: " + keyword);
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                RecentList.ItemsSource = RecentFiles;
+                return;
+            }
+
+            var result = RecentFiles
+                .Where(x => x.FileName.ToLower().Contains(keyword))
+                .ToList();
+
+            RecentList.ItemsSource = result;
         }
     }
 
