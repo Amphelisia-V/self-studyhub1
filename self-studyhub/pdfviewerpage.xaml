@@ -37,7 +37,8 @@
             
 
             <!-- PDF Viewer -->
-           
-    </Grid>
+            <wv2:WebView2 x:Name="PdfViewer" Grid.Column="0"  />
+
+        </Grid>
     </Grid>
 </UserControl>
