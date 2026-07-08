@@ -16,9 +16,9 @@ namespace self_studyhub
     {
         public App()
         {
-            SyncfusionLicenseProvider.RegisterLicense(
-                "YOUR LICENSE KEY"
-            );
+            SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JAaF5cX2pCfFN0Q35ZeENxcEVEYVZQRXxcQlZhSXxVdkJjXn1fcXVWRmVYUEx9XEY=");
+
+            InitializeComponent();
         }
     }
 }

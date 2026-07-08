@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+         xmlns:syncfusion="clr-namespace:Syncfusion.Windows.PdfViewer;assembly=Syncfusion.PdfViewer.WPF"
 
-    mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1000"
+             mc:Ignorable="d" 
+             d:DesignHeight="600"
+             d:DesignWidth="1000"
              Background="#1E1E1E">
 
     <Grid>
@@ -25,20 +25,13 @@
             <Button Content="Add Note" Width="100" Margin="5" Click="AddNote_Click"/>
             <Button Content="Save" Width="100" Margin="5,9,5,0" Click="Save_Click" VerticalAlignment="Top"/>
         </StackPanel>
+        <!-- Syncfusion PDF Viewer -->
+        <syncfusion:PdfViewerControl
+            x:Name="PdfViewer"
+            Grid.Row="1"/>
 
-        <!-- 🔹 Main Layout -->
-        <Grid Grid.Row="1" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                
-            </Grid.ColumnDefinitions>
-
-            
-            
-
-            <!-- PDF Viewer -->
-            <wv2:WebView2 x:Name="PdfViewer" Grid.Column="0"  />
-
+      
+           
         </Grid>
-    </Grid>
+   
 </UserControl>
