@@ -55,6 +55,8 @@ namespace self_studyhub.Pages
 );
 
                 File.Copy(originalPath, editedPath, true);
+                // Add to Recent
+                Models.RecentManager.AddRecent(originalPath);
 
                 PdfViewer.Load(editedPath);
             }

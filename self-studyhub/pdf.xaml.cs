@@ -17,6 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using self_studyhub.Pages;
 using System.Collections.ObjectModel;
+using self_studyhub.Models;
 
 namespace self_studyhub.Pages
 {
@@ -29,18 +30,13 @@ namespace self_studyhub.Pages
         {
             InitializeComponent();
 
-            if (RecentFiles == null)
-            {
-                RecentFiles = new ObservableCollection<RecentFile>();
-            }
-
-            RecentList.ItemsSource = RecentFiles;
-
+            RecentList.ItemsSource = RecentManager.RecentFiles;
+        
         }
 
         private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var file = RecentList.SelectedItem as RecentFile;
+            var file = RecentList.SelectedItem as Recentfile;
 
             if (file == null)
                 return;
@@ -85,35 +81,15 @@ namespace self_studyhub.Pages
 
                 string selectedPath = openFileDialog.FileName;
 
-                AddRecentFile(selectedPath);
+                RecentManager.AddRecent(selectedPath);
 
                 pdfviewerpage viewer = new pdfviewerpage(selectedPath);
 
                 main.MainContent.Content = viewer;
             }
         }
-        private void AddRecentFile(string path)
-        {
-           
-            RecentFiles.Insert(0,
-        new RecentFile
-        {
-            FileName = System.IO.Path.GetFileName(path),
-            FilePath = path,
-            LastOpened = DateTime.Now
-        });
-        }
-
-        public class RecentFile
-        {
-            public string FileName { get; set; }
-            public string FilePath { get; set; }
-            public DateTime LastOpened { get; set; }
-        }
-
-        public static ObservableCollection<RecentFile> RecentFiles { get; set; }
-
-
+     
+      
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
             string file = "lastsession.txt";
@@ -156,13 +132,13 @@ namespace self_studyhub.Pages
 
             if (string.IsNullOrWhiteSpace(keyword))
             {
-                RecentList.ItemsSource = RecentFiles;
+                RecentList.ItemsSource = RecentManager.RecentFiles;
                 return;
             }
 
-            var result = RecentFiles
-                .Where(x => x.FileName.ToLower().Contains(keyword))
-                .ToList();
+            var result = RecentManager.RecentFiles
+     .Where(x => x.FileName.ToLower().Contains(keyword))
+     .ToList();
 
             RecentList.ItemsSource = result;
         }
