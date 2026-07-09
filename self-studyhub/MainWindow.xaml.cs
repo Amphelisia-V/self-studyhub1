@@ -27,6 +27,10 @@ namespace self_studyhub
         BrowserPage browserPage = new BrowserPage();
         PDFPage pDFPage = new PDFPage();
         NotePage note = new NotePage();
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
         public MainWindow(int userID)
         {
             InitializeComponent();

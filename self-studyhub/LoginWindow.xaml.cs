@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Data.SqlClient;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace self_studyhub
 {
@@ -21,12 +22,13 @@ namespace self_studyhub
     /// </summary>
     public partial class LoginWindow : Window
     {
-       
+        private readonly HttpClient client = new HttpClient();
         public LoginWindow()
         {
             InitializeComponent();
         }
-        private void Login_Click(object sender, RoutedEventArgs e)
+
+        private async void Login_Click(object sender, RoutedEventArgs e)
         {
             string email = txtEmail.Text.Trim();
             string password = txtPassword.Password.Trim();
@@ -37,43 +39,66 @@ namespace self_studyhub
                 return;
             }
 
-            try
+            
+          try
             {
-                using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-19080AH\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                var loginData = new
                 {
-                    con.Open();
+                    Email = email,
+                    Password = password
+                };
 
-                    string query = "SELECT UserId, username, email FROM Users_tb WHERE email=@Email AND password=@password";
-                    SqlCommand cmd = new SqlCommand(query, con);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@password", password);
 
-                    SqlDataReader reader = cmd.ExecuteReader();
+                string json = JsonConvert.SerializeObject(loginData);
 
-                    if (reader.Read())
-                    {
-                        int userId =Convert.ToInt32(reader["UserId"]);
-                        string userName = reader["username"].ToString();
-                        string emailFromDb = reader["email"].ToString(); // rename to avoid conflict
 
-                        MessageBox.Show($"Welcome {userName}!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                StringContent content = new StringContent(
+                    json,
+                    Encoding.UTF8,
+                    "application/json"
+                );
 
-                        // Open HomePage (UserControl or Window)
-                        MainWindow main = new MainWindow(userId);
-                        main.Show();
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Username or password incorrect!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
+
+                HttpResponseMessage response = await client.PostAsync(
+                    "https://localhost:7118/swagger/index.html",
+                    content
+                );
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+
+
+                    MessageBox.Show(
+                        "Login Successful!",
+                        "Success",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+
+
+                    MainWindow main = new MainWindow();
+                    main.Show();
+
+                    this.Close();
                 }
+                else
+                {
+                    MessageBox.Show(
+                        "Email or Password Incorrect!",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                }
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
-        }
+           }
 
         private void TogglePassword_Click(object sender, RoutedEventArgs e)
         {
