@@ -1,11 +1,12 @@
 ﻿using MaterialDesignThemes.Wpf;
+using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Wpf;
 using self_studyhub.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-
+using System.Data.SqlClient;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,10 +19,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
-using Newtonsoft.Json;
+using static self_studyhub.Pages.PDFPage;
 using System.Net.Http;
-
+using Newtonsoft.Json;
 
 namespace self_studyhub.Pages
 {
@@ -31,88 +31,75 @@ namespace self_studyhub.Pages
     public partial class YouTubePage : UserControl
     {
         public ObservableCollection<RecentVideo> RecentVideos { get; set; }
-        
+
         private readonly HttpClient client = new HttpClient();
+
         private int userId;
         public YouTubePage(int userId)
         {
             InitializeComponent();
             this.userId = userId;
-           
             SaveSnackbar.MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(3));
             RecentVideos = new ObservableCollection<RecentVideo>();
 
             RecentList.ItemsSource = RecentVideos;
 
-            InitializeWebView();
-            Loaded += async (s, e) =>
-            {
-                await LoadRecentVideos();
-            };
-            // WebView ကို စတင်ပွင့်ဖို့ ခေါ်ထားရပါမယ်
+            this.Loaded += YouTubePage_Loaded;
 
+            // WebView ကို စတင်ပွင့်ဖို့ ခေါ်ထားရပါမယ်
+        
         }
+       
         // 1️⃣ WebView2 ကို App start မှာ initialize
-        private async void InitializeWebView()
+        private async Task InitializeWebView()
         {
             try
             {
                 await VideoView.EnsureCoreWebView2Async(null);
-
-
-                VideoView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
-                VideoView.CoreWebView2.Settings.IsStatusBarEnabled = false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("WebView2 initialization error:\n" + ex.Message);
             }
         }
-        private async Task EnsureWebView()
+        private async void YouTubePage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (VideoView.CoreWebView2 == null)
-            {
-                await VideoView.EnsureCoreWebView2Async();
-            }
+            await InitializeWebView();
+
+            await LoadRecentVideos();
         }
 
         private async void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
-            await EnsureWebView();
-
-
-            string url = youtubelinkbox.Text.Trim();
-
-
-            string videoId = "";
-
-
-            if (url.Contains("watch?v="))
+            if (VideoView != null && VideoView.CoreWebView2 != null)
             {
-                videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
-                             .Split('&')[0];
+                await VideoView.EnsureCoreWebView2Async();
+
+                string url = youtubelinkbox.Text;
+
+                if (url.Contains("watch?v="))
+                {
+                    string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1].Split('&')[0];
+                   
+                    string embedUrl = $"https://www.youtube.com/embed/{videoId}";
+                    
+                    VideoView.CoreWebView2.Navigate(embedUrl);
+
+                    await WatchVideo("YouTube Video " + videoId, url);
+                }
+                else if (url.StartsWith("https://"))
+                {
+                    VideoView.CoreWebView2.Navigate(url);
+
+                    // Add Recent Video
+                    await WatchVideo("YouTube Video ", url);
+                }
+
             }
-            else if (url.Contains("youtu.be"))
+            else
             {
-                videoId = url.Split('/').Last()
-                             .Split('?')[0];
+                MessageBox.Show("please wait a second");
             }
-
-
-            if (string.IsNullOrEmpty(videoId))
-            {
-                MessageBox.Show("Invalid YouTube URL");
-                return;
-            }
-
-
-            VideoView.CoreWebView2.Navigate(
-     $"https://www.youtube-nocookie.com/embed/{videoId}"
- );
-            await WatchVideo(
-                "YouTube Video " + videoId,
-                url
-            );
         }
         private async Task WatchVideo(string title, string url)
         {
@@ -124,17 +111,22 @@ namespace self_studyhub.Pages
                 WatchedDate = DateTime.Now
             };
 
+
             string json = JsonConvert.SerializeObject(video);
 
-            StringContent content = new StringContent(
+
+            var content = new StringContent(
                 json,
                 Encoding.UTF8,
-                "application/json");
+                "application/json"
+            );
 
-            HttpResponseMessage response =
-                await client.PostAsync(
-                    "https://localhost:7118/api/RecentVideos",
-                    content);
+
+            var response = await client.PostAsync(
+                "https://localhost:7118/api/RecentVideos",
+                content
+            );
+
 
             if (response.IsSuccessStatusCode)
             {
@@ -142,30 +134,48 @@ namespace self_studyhub.Pages
             }
             else
             {
-                MessageBox.Show("Cannot save recent video");
+                MessageBox.Show("Save video failed");
             }
         }
-        private async Task  LoadRecentVideos()
+        private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RecentList.SelectedItem is RecentVideo video)
+            {
+                if (VideoView != null && VideoView.CoreWebView2 != null)
+                {
+                    string url = video.VideoUrl;
+
+                    if (url.Contains("watch?v="))
+                    {
+                        string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
+                                            .Split('&')[0];
+
+                        string embedUrl = $"https://www.youtube.com/embed/{videoId}";
+
+                        VideoView.CoreWebView2.Navigate(embedUrl);
+                    }
+                    else
+                    {
+                        VideoView.CoreWebView2.Navigate(url);
+                    }
+                }
+            }
+        }
+        private async Task LoadRecentVideos()
         {
             try
             {
-                RecentVideos.Clear();
-
-                HttpResponseMessage response =
-                    await client.GetAsync(
+                var response = await client.GetAsync(
                     $"https://localhost:7118/api/RecentVideos/{userId}"
-                    );
-
+                );
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string json =
-                        await response.Content.ReadAsStringAsync();
+                    string json = await response.Content.ReadAsStringAsync();
 
+                    var videos = JsonConvert.DeserializeObject<List<RecentVideo>>(json);
 
-                    var videos =
-                        JsonConvert.DeserializeObject<List<RecentVideo>>(json);
-
+                    RecentVideos.Clear();
 
                     if (videos != null)
                     {
@@ -175,48 +185,13 @@ namespace self_studyhub.Pages
                         }
                     }
                 }
-                else
-                {
-                    MessageBox.Show("Cannot load recent videos");
-                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
-        private async void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (RecentList.SelectedItem is RecentVideo video)
-            {
-                await EnsureWebView();
-
-                string url = video.VideoUrl;
-
-                string videoId = "";
-
-
-                if (url.Contains("watch?v="))
-                {
-                    videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
-                                 .Split('&')[0];
-                }
-                else if (url.Contains("youtu.be"))
-                {
-                    videoId = url.Split('/').Last()
-                                 .Split('?')[0];
-                }
-
-
-                if (!string.IsNullOrEmpty(videoId))
-                {
-                    VideoView.CoreWebView2.Navigate(
-      $"https://www.youtube.com/embed/{videoId}?enablejsapi=1"
-  );
-                }
-            }
-        }
-        public static event Action OnNoteSaved;
+        public event Action<string, string> NoteSaved;
         private void SaveNote_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TitleBox.Text))
@@ -231,10 +206,28 @@ namespace self_studyhub.Pages
                 return;
             }
 
-           
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            {
+                con.Open();
+
+                SqlCommand cmd = new SqlCommand(
+                    "INSERT INTO Notes_tb (UserId, Title, Content, Created) VALUES (@UserId, @Title, @Content, @Created)", con);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@Title", TitleBox.Text);
+                cmd.Parameters.AddWithValue("@Content", NoteBox.Text);
+                cmd.Parameters.AddWithValue("@Created", DateTime.Now);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            SaveSnackbar.MessageQueue?.Enqueue("✅ Note saved successfully!");
+
+            TitleBox.Clear();
+            NoteBox.Clear();
+            OnNoteSaved?.Invoke();
         }
-        
-       
+        public static event Action OnNoteSaved;
+
 
     }
 

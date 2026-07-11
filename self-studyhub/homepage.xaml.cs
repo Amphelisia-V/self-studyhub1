@@ -359,9 +359,7 @@ namespace self_studyhub.Pages
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string keyword = SearchBox.Text;
-
-            MessageBox.Show("You search: " + keyword);
+          
         }
     }
 }

@@ -214,6 +214,7 @@
     <Compile Include="Models\Note.cs" />
     <Compile Include="Models\Recentfile.cs" />
     <Compile Include="Models\RecentManager.cs" />
+    <Compile Include="Models\RecentPDF.cs" />
     <Compile Include="Models\RecentVideo.cs" />
     <Compile Include="Models\TaksItem.cs" />
     <Compile Include="note.cs">

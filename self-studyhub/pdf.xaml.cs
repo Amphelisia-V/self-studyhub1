@@ -1,6 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32; // For OpenFileDialog
+using self_studyhub.Models;
+using self_studyhub.Pages;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,12 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Win32; // For OpenFileDialog
-using System.IO;
-using System.Diagnostics;
-using self_studyhub.Pages;
-using System.Collections.ObjectModel;
-using self_studyhub.Models;
+using Newtonsoft.Json;
 
 namespace self_studyhub.Pages
 {
@@ -26,24 +28,123 @@ namespace self_studyhub.Pages
     /// </summary>
     public partial class PDFPage : UserControl
     {
-        public PDFPage()
+        public ObservableCollection<RecentPDF> RecentPDFs { get; set; }
+
+        private readonly HttpClient client = new HttpClient();
+
+        private int userId;
+        public PDFPage(int userId)
         {
             InitializeComponent();
 
-            RecentList.ItemsSource = RecentManager.RecentFiles;
-        
+            this.userId = userId;
+
+            RecentPDFs = new ObservableCollection<RecentPDF>();
+
+            RecentList.ItemsSource = RecentPDFs;
+
+            this.Loaded += PDFPage_Loaded;
+
+        }
+        private async void PDFPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadRecentPDFs();
+        }
+        private async Task LoadRecentPDFs()
+        {
+            try
+            {
+                var response = await client.GetAsync(
+                    $"https://localhost:7118/api/RecentPDFs/{userId}"
+                );
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+
+
+                    var pdfs = JsonConvert.DeserializeObject<List<RecentPDF>>(json);
+
+
+                    RecentPDFs.Clear();
+
+
+                    if (pdfs != null)
+                    {
+                        foreach (var pdf in pdfs)
+                        {
+                            RecentPDFs.Add(pdf);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async Task<RecentPDF> SaveRecentPDF(string fileName, string filePath)
+        {
+            try
+            {
+                var pdf = new RecentPDF
+                {
+                    UserId = userId,
+                    FileName = fileName,
+                    FilePath = filePath,
+                    IsSaved = true,
+                    OpenedDate = DateTime.Now
+                };
+
+
+                string json = JsonConvert.SerializeObject(pdf);
+
+
+                var content = new StringContent(
+                    json,
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+
+                var response = await client.PostAsync(
+                    "https://localhost:7118/api/RecentPDFs",
+                    content
+                );
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+
+                    var savedPdf = JsonConvert.DeserializeObject<RecentPDF>(result);
+
+                    await LoadRecentPDFs();
+
+                    return savedPdf;
+                }
+                else
+                {
+                    MessageBox.Show("PDF save failed");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
         }
 
         private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var file = RecentList.SelectedItem as Recentfile;
+            var file = RecentList.SelectedItem as RecentPDF;
 
             if (file == null)
                 return;
-            MessageBox.Show(
-       "Name: " + file.FileName +
-       "\nPath: " + file.FilePath
-   );
+
+          
             string fullPath = file.FilePath;
 
 
@@ -57,12 +158,12 @@ namespace self_studyhub.Pages
 
             if (main != null)
             {
-                main.MainContent.Content = new pdfviewerpage(fullPath);
+                main.MainContent.Content = new pdfviewerpage(fullPath, userId, file.PdfId);
             }
 
         }
 
-        private void OpenPDFButton_Click(object sender, RoutedEventArgs e)
+        private async void OpenPDFButton_Click(object sender, RoutedEventArgs e)
         {
      
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -81,33 +182,73 @@ namespace self_studyhub.Pages
 
                 string selectedPath = openFileDialog.FileName;
 
-                RecentManager.AddRecent(selectedPath);
 
-                pdfviewerpage viewer = new pdfviewerpage(selectedPath);
+                var savedPdf = await SaveRecentPDF(
+       System.IO.Path.GetFileName(selectedPath),
+       selectedPath
+   );
 
-                main.MainContent.Content = viewer;
+
+                if (savedPdf != null)
+                {
+                    pdfviewerpage viewer =
+                        new pdfviewerpage(
+                            selectedPath,
+                            userId,
+                            savedPdf.PdfId
+                        );
+
+                    main.MainContent.Content = viewer;
+                }
             }
         }
      
       
-        private void ContinueButton_Click(object sender, RoutedEventArgs e)
+        private async void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
-            string file = "lastsession.txt";
-
-            if (File.Exists(file))
+            try
             {
-                string[] data = File.ReadAllLines(file);
+                var response = await client.GetAsync(
+                    $"https://localhost:7118/api/RecentPDFs/last/{userId}"
+                );
 
-                string pdfPath = data[0];
-                int page = int.Parse(data[1]);
 
-                MessageBox.Show("Opening Last Session\nPDF: " + pdfPath + "\nPage: " + page);
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
 
-                // ဒီနေရာမှာ PDF viewer ကို open လုပ်နိုင်တယ်
+
+                    var pdf = JsonConvert.DeserializeObject<RecentPDF>(json);
+
+
+                    if (pdf != null)
+                    {
+                        if (!File.Exists(pdf.FilePath))
+                        {
+                            MessageBox.Show("PDF file not found");
+                            return;
+                        }
+
+
+                        var main = Window.GetWindow(this) as MainWindow;
+
+
+                        if (main != null)
+                        {
+                            main.MainContent.Content =
+                                new pdfviewerpage(pdf.FilePath, userId, pdf.PdfId);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No previous PDF session found");
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("No previous session found.");
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -132,11 +273,11 @@ namespace self_studyhub.Pages
 
             if (string.IsNullOrWhiteSpace(keyword))
             {
-                RecentList.ItemsSource = RecentManager.RecentFiles;
+                RecentList.ItemsSource = RecentPDFs;
                 return;
             }
 
-            var result = RecentManager.RecentFiles
+            var result =RecentPDFs
      .Where(x => x.FileName.ToLower().Contains(keyword))
      .ToList();
 

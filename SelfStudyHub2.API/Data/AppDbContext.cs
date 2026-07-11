@@ -16,14 +16,20 @@ namespace SelfStudyHub2.API.Data
 
         public DbSet<RecentVideo> RecentYTVideos { get; set; }
 
+        public DbSet<RecentPDF> RecentPDFs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
-
-
             modelBuilder.Entity<RecentVideo>()
                 .ToTable("RecentYTVideos_tb");
+
+            modelBuilder.Entity<RecentPDF>()
+        .ToTable("PDFHistory_tb");
+
+            modelBuilder.Entity<RecentPDF>()
+      .HasKey(x => x.PdfId);
+
             base.OnModelCreating(modelBuilder);
         }
+        
     }
 }

@@ -1,23 +1,35 @@
-﻿using System;
+﻿using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Annot;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using self_studyhub.Models;
+using Syncfusion.Pdf;
+using System;
 using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Annot;
 
 
 namespace self_studyhub.Pages
 {
     public partial class pdfviewerpage : UserControl
     {
+
         private string originalPath;
         private string editedPath;
-
-        public pdfviewerpage(string pdfPath)
+        private readonly HttpClient client = new HttpClient();
+        private int userId;
+        private int pdfId;
+        public pdfviewerpage(string pdfPath, int userId, int pdfId)
         {
             InitializeComponent();
-   
+
+            this.userId = userId;
+            this.pdfId = pdfId;
+
             originalPath = pdfPath;
 
             if (!File.Exists(originalPath))
@@ -32,15 +44,16 @@ namespace self_studyhub.Pages
              );
 
             File.Copy(originalPath, editedPath, true);
-
+            PdfViewer.CurrentPageChanged += PdfViewer_CurrentPageChanged;
             // Load PDF into Syncfusion Viewer
             Loaded += Pdfviewerpage_Loaded;
+
         }
         private void Pdfviewerpage_Loaded(object sender, RoutedEventArgs e)
         {
             PdfViewer.Load(editedPath);
         }
-        private  void OpenPdf_Click(object sender, RoutedEventArgs e)
+        private async void OpenPdf_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "PDF Files (*.pdf)|*.pdf";
@@ -56,94 +69,16 @@ namespace self_studyhub.Pages
 
                 File.Copy(originalPath, editedPath, true);
                 // Add to Recent
-                Models.RecentManager.AddRecent(originalPath);
+                await SavePDFHistory(
+           Path.GetFileName(originalPath),
+           originalPath
+       );
 
                 PdfViewer.Load(editedPath);
             }
         }
        
-        private void Highlight_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(editedPath))
-                return;
-
-
-            string tempPath = editedPath.Replace(".pdf", "_temp.pdf");
-
-
-            using (PdfDocument pdfDoc =
-                new PdfDocument(
-                    new PdfReader(editedPath),
-                    new PdfWriter(tempPath)))
-            {
-
-                var page = pdfDoc.GetPage(1);
-
-
-                var rect =
-                    new iText.Kernel.Geom.Rectangle(100, 600, 200, 20);
-
-
-                var highlight =
-                    PdfTextMarkupAnnotation.CreateHighLight(
-                        rect,
-                        new float[]
-                        {
-                            100,600,
-                            300,600
-                        });
-
-
-                page.AddAnnotation(highlight);
-            }
-
-
-            File.Delete(editedPath);
-            File.Move(tempPath, editedPath);
-
-
-            PdfViewer.Load(editedPath);
-        }
-
-        private void AddNote_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(editedPath))
-                return;
-
-
-            string tempPath = editedPath.Replace(".pdf", "_temp.pdf");
-
-
-            using (PdfDocument pdfDoc =
-                new PdfDocument(
-                    new PdfReader(editedPath),
-                    new PdfWriter(tempPath)))
-            {
-
-                var page = pdfDoc.GetPage(1);
-
-
-                var rect =
-                    new iText.Kernel.Geom.Rectangle(100, 550, 20, 20);
-
-
-                var note = new PdfTextAnnotation(rect);
-
-                note.SetContents("This is my note");
-
-
-                page.AddAnnotation(note);
-            }
-
-
-            File.Delete(editedPath);
-            File.Move(tempPath, editedPath);
-
-
-            PdfViewer.Load(editedPath);
-        }
-
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(editedPath)) return;
 
@@ -153,7 +88,92 @@ namespace self_studyhub.Pages
             if (dialog.ShowDialog() == true)
             {
                 File.Copy(editedPath, dialog.FileName, true);
+                await SavePDFHistory(
+    Path.GetFileName(dialog.FileName),
+    dialog.FileName
+);
+
+                MessageBox.Show("PDF saved successfully");
             }
         }
+        private async Task SavePDFHistory(string fileName, string filePath)
+        {
+            var pdf = new RecentPDF
+            {
+                UserId = userId,
+                FileName =fileName,
+                FilePath = filePath,
+                IsSaved = true,
+                OpenedDate = DateTime.Now
+            };
+
+
+            string json = JsonConvert.SerializeObject(pdf);
+
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+
+            var response = await client.PostAsync(
+                "https://localhost:7118/api/RecentPDFs",
+                content
+            );
+
+
+            if (!response.IsSuccessStatusCode)
+            {
+                MessageBox.Show("PDF save failed");
+            }
+        }
+        private async void ClosePdf_Click(object sender, RoutedEventArgs e)
+        {
+            await SaveCurrentPage();
+
+            var main = Window.GetWindow(this) as MainWindow;
+
+            if (main != null)
+            {
+                main.MainContent.Content = main.PDFPageInstance;
+            }
+        }
+        private int currentPage = 1;
+
+
+        private void PdfViewer_CurrentPageChanged(object sender, EventArgs e)
+        {
+            currentPage = PdfViewer.CurrentPage;
+
+            Console.WriteLine("Current Page: " + currentPage);
+        }
+        private async Task SaveCurrentPage()
+        {
+            var pdf = new RecentPDF
+            {
+                PdfId = pdfId,
+                UserId = userId,
+                FilePath = originalPath,
+                CurrentPage = currentPage
+            };
+
+
+            string json = JsonConvert.SerializeObject(pdf);
+
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            await client.PutAsync(
+        "https://localhost:7118/api/RecentPDFs/page",
+        content);
+        }
+   
+       
     }
 }

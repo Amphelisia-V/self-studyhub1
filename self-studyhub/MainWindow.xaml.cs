@@ -26,9 +26,9 @@ namespace self_studyhub
         HomePage homePage ;
         YouTubePage youTubePage;
         BrowserPage browserPage = new BrowserPage();
-        PDFPage pDFPage = new PDFPage();
+        PDFPage pDFPage;
         NotePage note;
-       
+        public PDFPage PDFPageInstance { get; private set; }
         public MainWindow(int userID)
         {
             InitializeComponent();
@@ -40,6 +40,10 @@ namespace self_studyhub
             note = new NotePage(userID);
 
             youTubePage = new YouTubePage(userID);
+
+            pDFPage = new PDFPage(userID);
+
+            PDFPageInstance = pDFPage;
 
 
             YouTubePage.OnNoteSaved += note.LoadNotes;

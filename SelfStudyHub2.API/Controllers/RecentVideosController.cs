@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SelfStudyHub2.API.Data;
 using SelfStudyHub2.API.Models;
 
@@ -20,13 +21,12 @@ namespace SelfStudyHub2.API.Controllers
 
         // GET: api/RecentVideos/1
         [HttpGet("{userId}")]
-        public IActionResult GetRecentVideos(int userId)
+        public async Task<IActionResult> GetRecentVideos(int userId)
         {
-            var videos = _context.RecentYTVideos
+            var videos = await _context.RecentYTVideos
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.WatchedDate)
-                .ToList();
-
+                .ToListAsync();
 
             return Ok(videos);
         }
@@ -35,16 +35,28 @@ namespace SelfStudyHub2.API.Controllers
 
         // POST: api/RecentVideos
         [HttpPost]
-        public IActionResult SaveRecentVideo(RecentVideo video)
+        public async Task<IActionResult> SaveRecentVideo(RecentVideo video)
         {
+            var existingVideo = await _context.RecentYTVideos
+                .FirstOrDefaultAsync(x =>
+                    x.UserId == video.UserId &&
+                    x.VideoUrl == video.VideoUrl);
+
+            if (existingVideo != null)
+            {
+                existingVideo.WatchedDate = DateTime.Now;
+                existingVideo.VideoTitle = video.VideoTitle;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(existingVideo);
+            }
 
             video.WatchedDate = DateTime.Now;
 
-
             _context.RecentYTVideos.Add(video);
 
-            _context.SaveChanges();
-
+            await _context.SaveChangesAsync();
 
             return Ok(video);
         }
