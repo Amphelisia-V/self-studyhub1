@@ -1,21 +1,22 @@
-﻿using System;
+﻿using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json;
+using self_studyhub.Models;
+
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Data.SqlClient;
-using self_studyhub.Models;
-using MaterialDesignThemes.Wpf;
+
 
 namespace self_studyhub.Pages
 {
@@ -24,14 +25,26 @@ namespace self_studyhub.Pages
     /// </summary>
     public partial class NotePage : UserControl
     {
-        public NotePage()
+        private readonly HttpClient client = new HttpClient();
+        private int userId;
+        public ObservableCollection<Note> Notes { get; set; }
+        public NotePage(int userId)
         {
             InitializeComponent();
-            LoadNotes();
-            YouTubePage.OnNoteSaved += LoadNotes;
+
+            this.userId = userId;
+
+            Notes = new ObservableCollection<Note>();
+            
+
             SortBox.SelectedIndex = 0;
 
+            LoadNotes();
+
+            YouTubePage.OnNoteSaved += LoadNotes;
         }
+     
+
         private void NewNote_Click(object sender, RoutedEventArgs e)
         {
             editingNote = null;
@@ -68,57 +81,73 @@ namespace self_studyhub.Pages
 
             EditorTransform.BeginAnimation(TranslateTransform.XProperty, slideOut);
         }
-        public class Note
-        {
-            public int NoteId { get; set; }
-            public string Title { get; set; }
-            public string Content { get; set; }
-            public DateTime Created { get; set; }
-        }
+       
 
-        private List<Note> notes = new List<Note>();
+        
         private Note editingNote = null;
 
-        private void SaveNote_Click(object sender, RoutedEventArgs e)
+        private async void SaveNote_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(NoteTitleBox.Text))
-                return;
-
-            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            if (editingNote != null)
             {
-                con.Open();
+                UpdateNote(editingNote);
+                CloseEditor_Click(null, null);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(NoteTitleBox.Text))
+            {
+                MessageBox.Show("Title is required");
+                return;
+            }
 
-                if (editingNote == null)
+            var noteData = new
+            {
+                Title = NoteTitleBox.Text,
+                Content = NoteContentBox.Text,
+                UserId = userId
+            };
+
+
+            string json = JsonConvert.SerializeObject(noteData);
+
+
+            StringContent content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(
+                    "https://localhost:7118/api/Notes",
+                    content
+                );
+
+
+                if (response.IsSuccessStatusCode)
                 {
-                    // INSERT (New Note)
-                    SqlCommand cmd = new SqlCommand(
-                        "INSERT INTO Notes_tb (Title, Content, Created) VALUES (@Title, @Content, @Created)", con);
+                    MessageBox.Show("Note saved successfully!");
 
-                    cmd.Parameters.AddWithValue("@Title", NoteTitleBox.Text);
-                    cmd.Parameters.AddWithValue("@Content", NoteContentBox.Text);
-                    cmd.Parameters.AddWithValue("@Created", DateTime.Now);
+                    LoadNotes();
 
-                    cmd.ExecuteNonQuery();
+                    CloseEditor_Click(null, null);
                 }
                 else
                 {
-                    // UPDATE (Existing Note)
-                    SqlCommand cmd = new SqlCommand(
-                        "UPDATE Notes_tb SET Title=@Title, Content=@Content WHERE NoteId=@NoteId", con);
+                    string error = await response.Content.ReadAsStringAsync();
 
-                    cmd.Parameters.AddWithValue("@Title", NoteTitleBox.Text);
-                    cmd.Parameters.AddWithValue("@Content", NoteContentBox.Text);
-                    cmd.Parameters.AddWithValue("@NoteId", editingNote.NoteId);
-
-                    cmd.ExecuteNonQuery();
+                    MessageBox.Show(error);
                 }
 
             }
-
-            LoadNotes();
-            CloseEditor_Click(null, null);
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
         }
-            private void NoteTitleBox_GotFocus(object sender, RoutedEventArgs e)
+        private void NoteTitleBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (NoteTitleBox.Text == "Untitled Note")
             {
@@ -133,7 +162,7 @@ namespace self_studyhub.Pages
                 CornerRadius = new CornerRadius(18),
                 Margin = new Thickness(10),
                 Padding = new Thickness(15),
-                Cursor = Cursors.Hand
+                Cursor = System.Windows.Input.Cursors.Hand
             };
 
             StackPanel stack = new StackPanel();
@@ -163,7 +192,7 @@ namespace self_studyhub.Pages
                 Background = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(2),
-                Cursor = Cursors.Hand,
+                Cursor = System.Windows.Input.Cursors.Hand,
                 ToolTip = "Delete"
             };
 
@@ -296,15 +325,34 @@ namespace self_studyhub.Pages
 
             NotesContainer.Children.Add(card);
         }
-        private void RefreshNotes()
+        private void UpdateNote(Note note)
         {
-            NotesContainer.Children.Clear();
-
-            foreach (var note in notes)
+            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
             {
-                AddNoteCard(note);
+                con.Open();
+
+                string query =
+                @"UPDATE Notes_tb 
+          SET Title = @Title,
+              Content = @Content
+          WHERE NoteId = @NoteId 
+          AND UserId = @UserId";
+
+
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@Title", NoteTitleBox.Text);
+                cmd.Parameters.AddWithValue("@Content", NoteContentBox.Text);
+                cmd.Parameters.AddWithValue("@NoteId", note.NoteId);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                cmd.ExecuteNonQuery();
             }
+
+            LoadNotes();
+           
         }
+
         public void AddNoteFromYoutube(string title, string content)
         {
             Note newNote = new Note
@@ -314,24 +362,29 @@ namespace self_studyhub.Pages
                 Created = DateTime.Now
             };
 
-            notes.Add(newNote);
+            Notes.Add(newNote);
             AddNoteCard(newNote);
         }
-        private void LoadNotes()
+        public  void LoadNotes()
         {
-            notes.Clear();
-
+            Notes.Clear();
             using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
             {
                 con.Open();
 
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Notes_tb", con);
+                string query =
+                              "SELECT NoteId, Title, Content, Created FROM Notes_tb WHERE UserId = @UserId ORDER BY Created DESC";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@UserId", userId);
 
                 SqlDataReader reader = cmd.ExecuteReader();
 
+
                 while (reader.Read())
                 {
-                    notes.Add(new Note
+                    Notes.Add(new Note
                     {
                         NoteId = Convert.ToInt32(reader["NoteId"]),
                         Title = reader["Title"].ToString(),
@@ -341,7 +394,18 @@ namespace self_studyhub.Pages
                 }
             }
 
-            ApplySortAndSearch();
+
+            DisplayNotes();
+        }
+        private void DisplayNotes()
+        {
+            NotesContainer.Children.Clear();
+            NotesContainer.Children.Clear();
+
+            foreach (var note in Notes)
+            {
+                AddNoteCard(note);
+            }
         }
         private void DeleteNote(int noteId)
         {
@@ -349,14 +413,23 @@ namespace self_studyhub.Pages
             {
                 con.Open();
 
-                SqlCommand cmd = new SqlCommand(
-                    "DELETE FROM Notes_tb WHERE NoteId=@NoteId", con);
+                string query =
+                "DELETE FROM Notes_tb WHERE NoteId = @NoteId AND UserId = @UserId";
+
+
+                SqlCommand cmd = new SqlCommand(query, con);
 
                 cmd.Parameters.AddWithValue("@NoteId", noteId);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+
                 cmd.ExecuteNonQuery();
             }
 
+
             LoadNotes();
+
+           
         }
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -373,7 +446,7 @@ namespace self_studyhub.Pages
         {
             string keyword = SearchBox.Text?.ToLower() ?? "";
 
-            var filtered = notes
+            var filtered = Notes
                 .Where(n =>
                     n.Title.ToLower().Contains(keyword) ||
                     n.Content.ToLower().Contains(keyword))

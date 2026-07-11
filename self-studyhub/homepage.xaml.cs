@@ -39,7 +39,10 @@ namespace self_studyhub.Pages
             DrawCircleProgress(0.6);
             UpdateDailyGoal(3, 15);
             Loaded += HomePage_Loaded;
+
             this.userId = userId;
+
+
             LoadTasks();
         
 
@@ -225,7 +228,13 @@ namespace self_studyhub.Pages
         private void Task_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = sender as CheckBox;
+            if (checkBox == null)
+                return;
+
             TaskItem task = checkBox.DataContext as TaskItem;
+
+            if (task == null)
+                return;
 
             using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
             {
@@ -290,7 +299,7 @@ namespace self_studyhub.Pages
         }
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadTasks();
+           
         }
         
         private int _completed = 0;

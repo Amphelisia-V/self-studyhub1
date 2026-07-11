@@ -159,27 +159,32 @@ Margin="10">
                         <StackPanel>
 
                             <TextBlock Text="Recently Watched"
-                   Foreground="White"
-                   FontSize="20"
-                   FontWeight="Bold"/>
+                                 Foreground="White"
+                                 FontSize="20"
+                                 FontWeight="Bold"/>
                             <ListBox x:Name="RecentList"
-         Background="#141821"
-         Foreground="White"
-         SelectionChanged="RecentList_SelectionChanged">
+                                     Height="200"
+                                     Background="#141821"
+                                     Foreground="White"
+                                     SelectionChanged="RecentList_SelectionChanged"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
 
                                         <StackPanel Margin="10">
 
-                                            <TextBlock Text="{Binding Title}"
-                           Foreground="White"
-                           FontSize="16"/>
+                                            <TextBlock Text="{Binding VideoTitle}"
+                                                       Foreground="White"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       TextWrapping="Wrap"/>
 
-                                            <TextBlock Text="{Binding WatchedDate}"
-                           Foreground="Gray"
-                           FontSize="12"/>
-
+                                            <TextBlock Text="{Binding WatchedDate, StringFormat='{}{0:MM/dd/yyyy hh:mm tt}'}"
+                                                       Foreground="Gray"
+                                                       FontSize="12"
+                                                       Margin="0,5,0,0"/>
                                         </StackPanel>
 
                                     </DataTemplate>

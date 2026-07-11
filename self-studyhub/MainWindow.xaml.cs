@@ -22,26 +22,36 @@ namespace self_studyhub
     /// </summary>
     public partial class MainWindow : Window
     {
+        private int userID;
         HomePage homePage ;
-        YouTubePage youTubePage = new YouTubePage();
+        YouTubePage youTubePage;
         BrowserPage browserPage = new BrowserPage();
         PDFPage pDFPage = new PDFPage();
-        NotePage note = new NotePage();
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        NotePage note;
+       
         public MainWindow(int userID)
         {
             InitializeComponent();
+
+            this.userID = userID;
+
             homePage = new HomePage(userID);
+
+            note = new NotePage(userID);
+
+            youTubePage = new YouTubePage(userID);
+
+
+            YouTubePage.OnNoteSaved += note.LoadNotes;
+
+
             MainContent.Content = homePage;
-            youTubePage.NoteSaved += note.AddNoteFromYoutube;
-            
+
+
 
         }
-      
-       
+
+
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {

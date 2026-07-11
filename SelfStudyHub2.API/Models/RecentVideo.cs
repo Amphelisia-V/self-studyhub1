@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace self_studyhub.Models
+namespace SelfStudyHub2.API.Models
 {
     public class RecentVideo
     {
@@ -16,8 +13,11 @@ namespace self_studyhub.Models
 
         public string VideoUrl { get; set; } = "";
 
-        public string ThumbnailUrl { get; set; } = "";
+        public string? ThumbnailUrl { get; set; } 
 
         public DateTime WatchedDate { get; set; }
+
+
+        
     }
 }

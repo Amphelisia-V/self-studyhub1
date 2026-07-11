@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Data.SqlClient;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace self_studyhub
 {
@@ -23,7 +24,8 @@ namespace self_studyhub
         {
             InitializeComponent();
         }
-        private void Register_Click(object sender, RoutedEventArgs e)
+        private readonly HttpClient client = new HttpClient();
+        private async void Register_Click(object sender, RoutedEventArgs e)
         {
             string username = txtUsername.Text.Trim();
             string email = txtEmail.Text.Trim();
@@ -37,45 +39,37 @@ namespace self_studyhub
 
             try
             {
-                using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-19080AH\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                var registerData = new
                 {
-                    con.Open();
+                    Username = username,
+                    Email = email,
+                    Password = password
+                };
 
-                    // Check if username or email already exists
-                    string checkQuery = "SELECT COUNT(*) FROM Users_tb WHERE username=@username OR email=@email";
-                    SqlCommand checkCmd = new SqlCommand(checkQuery, con);
-                    checkCmd.Parameters.AddWithValue("@username", username);
-                    checkCmd.Parameters.AddWithValue("@email", email);
-                    int exists = (int)checkCmd.ExecuteScalar();
+                string json = JsonConvert.SerializeObject(registerData);
 
-                    if (exists > 0)
-                    {
-                        MessageBox.Show("Username or Email already exists!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
+                StringContent content = new StringContent(
+                    json,
+                    Encoding.UTF8,
+                    "application/json");
 
-                    // Insert new user
-                    string query = "INSERT INTO Users_tb (username,email,password) VALUES (@username,@email,@password)";
-                    SqlCommand cmd = new SqlCommand(query, con);
-                   
-                    cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@password", password); // optional: hash password later
+                HttpResponseMessage response = await client.PostAsync(
+                    "https://localhost:7118/api/Auth/register",
+                    content);
 
-                    int result = cmd.ExecuteNonQuery();
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Account Created Successfully!");
 
-                    if (result > 0)
-                    {
-                        MessageBox.Show("Account Created Successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LoginWindow login = new LoginWindow();
+                    login.Show();
+                    this.Close();
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
 
-                        LoginWindow login = new LoginWindow();
-                        login.Show();
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Registration failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show(error);
                 }
             }
             catch (Exception ex)

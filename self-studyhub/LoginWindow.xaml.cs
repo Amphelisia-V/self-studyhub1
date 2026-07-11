@@ -60,7 +60,7 @@ namespace self_studyhub
 
 
                 HttpResponseMessage response = await client.PostAsync(
-                    "https://localhost:7118/swagger/index.html",
+                    "https://localhost:7118/api/Auth/login",
                     content
                 );
 
@@ -69,18 +69,16 @@ namespace self_studyhub
                 {
                     string result = await response.Content.ReadAsStringAsync();
 
+                    LoginResponse login = JsonConvert.DeserializeObject<LoginResponse>(result);
 
-                    MessageBox.Show(
-                        "Login Successful!",
-                        "Success",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information
-                    );
+                    if (login == null)
+                    {
+                        MessageBox.Show("Login response is invalid.");
+                        return;
+                    }
 
-
-                    MainWindow main = new MainWindow();
+                    MainWindow main = new MainWindow(login.UserId);
                     main.Show();
-
                     this.Close();
                 }
                 else
@@ -155,6 +153,19 @@ namespace self_studyhub
         {
             ForgotPasswordWindow forgotWindow = new ForgotPasswordWindow();
             forgotWindow.ShowDialog();
+        }
+        public class LoginResponse
+        {
+            public int UserId { get; set; }
+
+            public string Username { get; set; }
+
+            public string Email { get; set; }
+            public LoginResponse()
+            {
+                Username = "";
+                Email = "";
+            }
         }
     }  
     }
