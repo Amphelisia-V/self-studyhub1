@@ -1,11 +1,10 @@
 ﻿using MaterialDesignThemes.Wpf;
-
 using Microsoft.Web.WebView2.Wpf;
 using self_studyhub.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.SqlClient;
+
 
 using System.Linq;
 using System.Text;
@@ -32,8 +31,9 @@ namespace self_studyhub.Pages
     public partial class YouTubePage : UserControl
     {
         public ObservableCollection<RecentVideo> RecentVideos { get; set; }
-        private int userId;
+        
         private readonly HttpClient client = new HttpClient();
+        private int userId;
         public YouTubePage(int userId)
         {
             InitializeComponent();
@@ -43,9 +43,14 @@ namespace self_studyhub.Pages
             RecentVideos = new ObservableCollection<RecentVideo>();
 
             RecentList.ItemsSource = RecentVideos;
-            _ = LoadRecentVideos();
-            // WebView ကို စတင်ပွင့်ဖို့ ခေါ်ထားရပါမယ်
+
             InitializeWebView();
+            Loaded += async (s, e) =>
+            {
+                await LoadRecentVideos();
+            };
+            // WebView ကို စတင်ပွင့်ဖို့ ခေါ်ထားရပါမယ်
+
         }
         // 1️⃣ WebView2 ကို App start မှာ initialize
         private async void InitializeWebView()
@@ -54,7 +59,9 @@ namespace self_studyhub.Pages
             {
                 await VideoView.EnsureCoreWebView2Async(null);
 
+
                 VideoView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
+                VideoView.CoreWebView2.Settings.IsStatusBarEnabled = false;
             }
             catch (Exception ex)
             {
@@ -71,39 +78,41 @@ namespace self_studyhub.Pages
 
         private async void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
-            if (VideoView.CoreWebView2 == null)
-            {
-                await VideoView.EnsureCoreWebView2Async();
-            }
+            await EnsureWebView();
 
-            string url = youtubelinkbox.Text;
+
+            string url = youtubelinkbox.Text.Trim();
+
+
+            string videoId = "";
+
 
             if (url.Contains("watch?v="))
             {
-                string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
-                                    .Split('&')[0];
-
-                VideoView.CoreWebView2.Navigate(
-                    $"https://www.youtube-nocookie.com/embed/{videoId}"
-                );
-
-                await WatchVideo("YouTube Video " + videoId, url);
+                videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
+                             .Split('&')[0];
             }
             else if (url.Contains("youtu.be"))
             {
-                await EnsureWebView();
-                string videoId = url.Split('/').Last()
-                                    .Split('?')[0];
-
-                MessageBox.Show("Video ID = " + videoId);
-
-                VideoView.CoreWebView2.Navigate(
-    $"https://www.youtube.com/embed/{videoId}"
-
- );
-
-                await WatchVideo("YouTube Video " + videoId, url);
+                videoId = url.Split('/').Last()
+                             .Split('?')[0];
             }
+
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                MessageBox.Show("Invalid YouTube URL");
+                return;
+            }
+
+
+            VideoView.CoreWebView2.Navigate(
+     $"https://www.youtube-nocookie.com/embed/{videoId}"
+ );
+            await WatchVideo(
+                "YouTube Video " + videoId,
+                url
+            );
         }
         private async Task WatchVideo(string title, string url)
         {
@@ -136,7 +145,7 @@ namespace self_studyhub.Pages
                 MessageBox.Show("Cannot save recent video");
             }
         }
-        private async  Task LoadRecentVideos()
+        private async Task  LoadRecentVideos()
         {
             try
             {
@@ -144,19 +153,26 @@ namespace self_studyhub.Pages
 
                 HttpResponseMessage response =
                     await client.GetAsync(
-                    $"https://localhost:7118/api/RecentVideos/{userId}");
+                    $"https://localhost:7118/api/RecentVideos/{userId}"
+                    );
+
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string json = await response.Content.ReadAsStringAsync();
+                    string json =
+                        await response.Content.ReadAsStringAsync();
+
 
                     var videos =
                         JsonConvert.DeserializeObject<List<RecentVideo>>(json);
 
 
-                    foreach (var video in videos)
+                    if (videos != null)
                     {
-                        RecentVideos.Add(video);
+                        foreach (var video in videos)
+                        {
+                            RecentVideos.Add(video);
+                        }
                     }
                 }
                 else
@@ -173,25 +189,30 @@ namespace self_studyhub.Pages
         {
             if (RecentList.SelectedItem is RecentVideo video)
             {
-                if (VideoView != null && VideoView.CoreWebView2 != null)
+                await EnsureWebView();
+
+                string url = video.VideoUrl;
+
+                string videoId = "";
+
+
+                if (url.Contains("watch?v="))
                 {
-                    string url = video.VideoUrl;
+                    videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
+                                 .Split('&')[0];
+                }
+                else if (url.Contains("youtu.be"))
+                {
+                    videoId = url.Split('/').Last()
+                                 .Split('?')[0];
+                }
 
-                    if (url.Contains("watch?v="))
-                    {
-                        string videoId = url.Split(new[] { "v=" }, StringSplitOptions.None)[1]
-                                            .Split('&')[0];
 
-                        VideoView.CoreWebView2.Navigate(
-                            $"https://www.youtube.com/embed/{videoId}"
-                        );
-
-                        await WatchVideo("YouTube Video " + videoId, url);
-                    }
-                    else
-                    {
-                        VideoView.CoreWebView2.Navigate(url);
-                    }
+                if (!string.IsNullOrEmpty(videoId))
+                {
+                    VideoView.CoreWebView2.Navigate(
+      $"https://www.youtube.com/embed/{videoId}?enablejsapi=1"
+  );
                 }
             }
         }
@@ -210,27 +231,7 @@ namespace self_studyhub.Pages
                 return;
             }
 
-            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
-            {
-                con.Open();
-
-                SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Notes_tb (Title, Content, Created,UserId) VALUES (@Title, @Content, @Created, @UserId)", con);
-
-                cmd.Parameters.AddWithValue("@Title", TitleBox.Text);
-                cmd.Parameters.AddWithValue("@Content", NoteBox.Text);
-                cmd.Parameters.AddWithValue("@Created", DateTime.Now);
-                cmd.Parameters.AddWithValue("@UserId", userId);
-
-                cmd.ExecuteNonQuery();
-            }
-
-            SaveSnackbar.MessageQueue?.Enqueue("✅ Note saved successfully!");
-
-            TitleBox.Clear();
-            NoteBox.Clear();
-
-            OnNoteSaved?.Invoke();
+           
         }
         
        
