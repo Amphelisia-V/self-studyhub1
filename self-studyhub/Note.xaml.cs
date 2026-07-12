@@ -5,7 +5,7 @@ using self_studyhub.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.SqlClient;
+
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -90,7 +90,7 @@ namespace self_studyhub.Pages
         {
             if (editingNote != null)
             {
-                UpdateNote(editingNote);
+               await UpdateNote(editingNote);
                 CloseEditor_Click(null, null);
                 return;
             }
@@ -325,32 +325,52 @@ namespace self_studyhub.Pages
 
             NotesContainer.Children.Add(card);
         }
-        private void UpdateNote(Note note)
+        private async Task UpdateNote(Note note)
         {
-            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            try
             {
-                con.Open();
+                var updateData = new
+                {
+                    NoteId = note.NoteId,
+                    Title = NoteTitleBox.Text,
+                    Content = NoteContentBox.Text,
+                    UserId = userId
+                };
 
-                string query =
-                @"UPDATE Notes_tb 
-          SET Title = @Title,
-              Content = @Content
-          WHERE NoteId = @NoteId 
-          AND UserId = @UserId";
+
+                string json = JsonConvert.SerializeObject(updateData);
 
 
-                SqlCommand cmd = new SqlCommand(query, con);
+                StringContent content = new StringContent(
+                    json,
+                    Encoding.UTF8,
+                    "application/json"
+                );
 
-                cmd.Parameters.AddWithValue("@Title", NoteTitleBox.Text);
-                cmd.Parameters.AddWithValue("@Content", NoteContentBox.Text);
-                cmd.Parameters.AddWithValue("@NoteId", note.NoteId);
-                cmd.Parameters.AddWithValue("@UserId", userId);
 
-                cmd.ExecuteNonQuery();
+                HttpResponseMessage response = await client.PutAsync(
+                    $"https://localhost:7118/api/Notes/{note.NoteId}",
+                    content
+                );
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                   
+
+                    LoadNotes();
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+
+                    MessageBox.Show(error);
+                }
             }
-
-            LoadNotes();
-           
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public void AddNoteFromYoutube(string title, string content)
@@ -365,37 +385,41 @@ namespace self_studyhub.Pages
             Notes.Add(newNote);
             AddNoteCard(newNote);
         }
-        public  void LoadNotes()
+        public async void LoadNotes()
         {
-            Notes.Clear();
-            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            try
             {
-                con.Open();
+                var response = await client.GetAsync(
+                    $"https://localhost:7118/api/Notes/{userId}"
+                );
 
-                string query =
-                              "SELECT NoteId, Title, Content, Created FROM Notes_tb WHERE UserId = @UserId ORDER BY Created DESC";
-
-                SqlCommand cmd = new SqlCommand(query, con);
-
-                cmd.Parameters.AddWithValue("@UserId", userId);
-
-                SqlDataReader reader = cmd.ExecuteReader();
-
-
-                while (reader.Read())
+                if (response.IsSuccessStatusCode)
                 {
-                    Notes.Add(new Note
+                    string json = await response.Content.ReadAsStringAsync();
+
+                    var notes = JsonConvert.DeserializeObject<List<Note>>(json);
+
+                    Notes.Clear();
+
+                    if (notes != null)
                     {
-                        NoteId = Convert.ToInt32(reader["NoteId"]),
-                        Title = reader["Title"].ToString(),
-                        Content = reader["Content"].ToString(),
-                        Created = Convert.ToDateTime(reader["Created"])
-                    });
+                        foreach (var note in notes)
+                        {
+                            Notes.Add(note);
+                        }
+                    }
+
+                    DisplayNotes();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to load notes.");
                 }
             }
-
-
-            DisplayNotes();
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         private void DisplayNotes()
         {
@@ -407,29 +431,29 @@ namespace self_studyhub.Pages
                 AddNoteCard(note);
             }
         }
-        private void DeleteNote(int noteId)
+        private async void DeleteNote(int noteId)
         {
-            using (SqlConnection con = new SqlConnection(DatabaseHelper.ConnectionString))
+            try
             {
-                con.Open();
+                var response = await client.DeleteAsync(
+                    $"https://localhost:7118/api/Notes/{noteId}"
+                );
 
-                string query =
-                "DELETE FROM Notes_tb WHERE NoteId = @NoteId AND UserId = @UserId";
-
-
-                SqlCommand cmd = new SqlCommand(query, con);
-
-                cmd.Parameters.AddWithValue("@NoteId", noteId);
-                cmd.Parameters.AddWithValue("@UserId", userId);
-
-
-                cmd.ExecuteNonQuery();
+                if (response.IsSuccessStatusCode)
+                {
+                    LoadNotes();
+                }
+                else
+                {
+                    MessageBox.Show("Delete failed.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
 
-            LoadNotes();
-
-           
         }
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {

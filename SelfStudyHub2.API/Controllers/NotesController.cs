@@ -64,8 +64,23 @@ namespace SelfStudyHub2.API.Controllers
                 message = "Note deleted successfully"
             });
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateNote(int id, Note note)
+        {
+            var existingNote = await _context.Notes.FindAsync(id);
+
+            if (existingNote == null)
+            {
+                return NotFound("Note not found");
+            }
+
+            existingNote.Title = note.Title;
+            existingNote.Content = note.Content;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(existingNote);
+        }
+
     }
-
-
-
-}
+} 
