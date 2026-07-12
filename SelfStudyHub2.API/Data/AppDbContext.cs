@@ -12,6 +12,8 @@ namespace SelfStudyHub2.API.Data
         }
         public DbSet<User> Users { get; set; }
 
+        public DbSet<PasswordReset> PasswordResets { get; set; }
+
         public DbSet<Note> Notes { get; set; }
 
         public DbSet<RecentVideo> RecentYTVideos { get; set; }
@@ -29,7 +31,20 @@ namespace SelfStudyHub2.API.Data
       .HasKey(x => x.PdfId);
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<PasswordReset>()
+       .ToTable("PasswordReset_tb");
+
+            modelBuilder.Entity<PasswordReset>()
+      .HasKey(x => x.ResetId);
+
+
+            modelBuilder.Entity<PasswordReset>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(x => x.UserId);
+
         }
-        
+
     }
 }

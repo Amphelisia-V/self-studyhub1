@@ -85,14 +85,32 @@ namespace self_studyhub.Pages
                     
                     VideoView.CoreWebView2.Navigate(embedUrl);
 
-                    await WatchVideo("YouTube Video " + videoId, url);
+                    VideoView.CoreWebView2.NavigationCompleted += async (s, args) =>
+                    {
+                        string title = await VideoView.CoreWebView2.ExecuteScriptAsync(
+                            "document.title"
+                        );
+
+                        title = title.Replace("\"", "");
+
+                        await WatchVideo(title, url);
+                    };
                 }
                 else if (url.StartsWith("https://"))
                 {
                     VideoView.CoreWebView2.Navigate(url);
 
-                    // Add Recent Video
-                    await WatchVideo("YouTube Video ", url);
+                    VideoView.CoreWebView2.NavigationCompleted += async (s, args) =>
+                    {
+                        string title = await VideoView.CoreWebView2.ExecuteScriptAsync(
+                            "document.title"
+                        );
+
+                        title = title.Replace("\"", "");
+
+                        // Add Recent Video
+                        await WatchVideo(title, url);
+                    };
                 }
 
             }

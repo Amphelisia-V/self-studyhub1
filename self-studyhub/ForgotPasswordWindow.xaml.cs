@@ -12,8 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-using System.Data.SqlClient;
-using System.Security.Cryptography;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 
 
@@ -24,6 +24,9 @@ namespace self_studyhub
     /// </summary>
     public partial class ForgotPasswordWindow : Window
     {
+        private readonly HttpClient client = new HttpClient();
+
+        private string userEmail = "";
         private string secretAnswerHash;
         private int userId;
         public ForgotPasswordWindow()
@@ -31,57 +34,69 @@ namespace self_studyhub
             InitializeComponent();
         }
 
-        private void ResetPassword_Click(object sender, RoutedEventArgs e)
+        private async void ResetPassword_Click(object sender, RoutedEventArgs e)
         {
-            string username = txtUsername.Text.Trim();
-            string email = txtEmail.Text.Trim();
+            string email = userEmail;
+            string password = txtNewPassword.Password.Trim();
 
-            if (username == "" || email == "")
+            if (email == "" || password == "")
             {
-                MessageBox.Show("Please enter both username and email", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please fill all fields");
                 return;
             }
 
+
+            var data = new
+            {
+                email = email,
+                newPassword = password
+            };
+
+
+            string json = JsonConvert.SerializeObject(data);
+
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+
             try
             {
-                using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-19080AH\\SQLEXPRESS;Initial Catalog=StudyControlDB;Integrated Security=True"))
+                var response = await client.PutAsync(
+                    "https://localhost:7118/api/Auth/reset-password",
+                    content
+                );
+
+
+                if (response.IsSuccessStatusCode)
                 {
-                    con.Open();
+                    MessageBox.Show(
+                        "Password reset successful"
+                    );
 
-                    string query = "SELECT id FROM Users_tb WHERE username=@username AND email=@Email";
-                    SqlCommand cmd = new SqlCommand(query, con);
-                    cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@Email", email);
 
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    LoginWindow login =
+                        new LoginWindow();
 
-                    if (reader.Read())
-                    {
-                        int userId = Convert.ToInt32(reader["id"]);
-                        reader.Close();
+                    login.Show();
 
-                        // Generate temporary password
-                        string tempPassword = GenerateTempPassword();
-
-                        // Update password in DB
-                        string updateQuery = "UPDATE Users_tb SET password=@tempPassword WHERE id=@id";
-                        SqlCommand updateCmd = new SqlCommand(updateQuery, con);
-                        updateCmd.Parameters.AddWithValue("@tempPassword", tempPassword);
-                        updateCmd.Parameters.AddWithValue("@id", userId);
-                        updateCmd.ExecuteNonQuery();
-
-                        MessageBox.Show($"Temporary password: {tempPassword}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Username or email is incorrect!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
+                    this.Close();
                 }
+                else
+                {
+                    string error =
+                        await response.Content.ReadAsStringAsync();
+
+                    MessageBox.Show(error);
+                }
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }
         private string GenerateTempPassword()
@@ -99,6 +114,119 @@ namespace self_studyhub
             LoginWindow login = new LoginWindow();
             login.Show();
             this.Close();
+        }
+
+        private async void SendOTP_Click(object sender, RoutedEventArgs e)
+        {
+            userEmail = txtEmail.Text.Trim();
+
+
+            if (userEmail == "")
+            {
+                MessageBox.Show("Enter email");
+                return;
+            }
+
+
+            var data = new
+            {
+                email = userEmail
+            };
+
+
+            string json = JsonConvert.SerializeObject(data);
+
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+
+            var response = await client.PostAsync(
+                "https://localhost:7118/api/Auth/forgot-password",
+                content
+            );
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                string result = await response.Content.ReadAsStringAsync();
+
+                dynamic otpResult = JsonConvert.DeserializeObject(result);
+
+                MessageBox.Show(
+                    "Your OTP is: " + otpResult.otp,
+                    "OTP"
+                );
+
+
+                Step1.Visibility = Visibility.Collapsed;
+                Step2.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MessageBox.Show("Email not found");
+            }
+        }
+        private async void VerifyOTP_Click(object sender, RoutedEventArgs e)
+        {
+            string otp = txtOTP.Text.Trim();
+
+
+            if (otp == "")
+            {
+                MessageBox.Show("Enter OTP");
+                return;
+            }
+
+
+            var data = new
+            {
+                email = userEmail,
+                otp = otp
+            };
+
+
+            string json = JsonConvert.SerializeObject(data);
+
+
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+
+            try
+            {
+                var response = await client.PostAsync(
+                    "https://localhost:7118/api/Auth/verify-otp",
+                    content
+                );
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("OTP verified");
+
+
+                    Step2.Visibility = Visibility.Collapsed;
+                    Step3.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+
+                    MessageBox.Show(error);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

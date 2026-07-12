@@ -41,9 +41,9 @@ namespace self_studyhub
             {
                 var registerData = new
                 {
-                    Username = username,
-                    Email = email,
-                    Password = password
+                    username = username,
+                    email = email,
+                    password = password
                 };
 
                 string json = JsonConvert.SerializeObject(registerData);
