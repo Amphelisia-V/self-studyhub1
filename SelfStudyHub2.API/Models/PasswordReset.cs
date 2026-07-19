@@ -14,9 +14,11 @@ namespace SelfStudyHub2.API.Models
 
         public bool IsUsed { get; set; }
 
+        public bool IsVerified { get; set; }
+
         public DateTime CreatedDate { get; set; }
 
-
+       
         public PasswordReset()
         {
             OTP = "";

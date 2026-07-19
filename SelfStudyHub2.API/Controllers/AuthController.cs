@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SelfStudyHub2.API.Data;
 using SelfStudyHub2.API.Models;
+using SelfStudyHub2.API.Services;
+using System.Security.Cryptography;
 
 namespace SelfStudyHub2.API.Controllers
 {
@@ -12,10 +14,12 @@ namespace SelfStudyHub2.API.Controllers
     {
 
         private readonly AppDbContext _context;
+        private readonly EmailService _emailService;
 
-        public AuthController(AppDbContext context)
+        public AuthController(AppDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
 
@@ -29,15 +33,33 @@ namespace SelfStudyHub2.API.Controllers
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(x =>
-                    x.email == request.Email &&
-                    x.password == request.Password);
+                    x.email == request.Email );
 
 
             if (user == null)
             {
                 return Unauthorized("Invalid email or password");
             }
+          
 
+
+            bool passwordCorrect = BCrypt.Net.BCrypt.Verify(
+                request.Password,
+                user.password
+            );
+
+
+            Console.WriteLine("Password Match: " + passwordCorrect);
+
+
+            if (!passwordCorrect)
+            {
+                return Unauthorized("Invalid email or password");
+            }
+            if (!user.IsEmailVerified)
+            {
+                return Unauthorized("Please verify your email first");
+            }
 
             return Ok(new
             {
@@ -69,24 +91,87 @@ namespace SelfStudyHub2.API.Controllers
                 return BadRequest("Email already exists");
             }
 
+            var otp = RandomNumberGenerator
+     .GetInt32(100000, 999999)
+     .ToString();
 
-            User newUser = new User
+            var verification = new EmailVerification
             {
-                username = request.username,
-                email = request.email,
-                password = request.password
+                Email = request.email,
+                OTP = otp,
+                ExpirationTime = DateTime.Now.AddMinutes(5),
+                IsUsed = false
             };
 
 
-            _context.Users.Add(newUser);
+            _context.EmailVerifications.Add(verification);
+
+            await _context.SaveChangesAsync();
+
+
+            await _emailService.SendEmailAsync(
+                request.email,
+                "Self Study Hub Email Verification",
+                $"Your OTP Code is: {otp}"
+            );
+
+
+            return Ok(new
+            {
+                message = "OTP sent to your email"
+            });
+        }
+        [HttpPost("verify-email-otp")]
+        public async Task<IActionResult> VerifyEmailOTP(VerifyOTPRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email) ||
+   string.IsNullOrEmpty(request.OTP) ||
+   string.IsNullOrEmpty(request.Username) ||
+   string.IsNullOrEmpty(request.Password))
+            {
+                return BadRequest("All fields required");
+            }
+            var verification = await _context.EmailVerifications
+                .FirstOrDefaultAsync(x =>
+                    x.Email == request.Email &&
+                    x.OTP == request.OTP &&
+                    !x.IsUsed);
+
+
+            if (verification == null)
+            {
+                return BadRequest("Invalid OTP");
+            }
+
+
+            if (verification.ExpirationTime < DateTime.Now)
+            {
+                return BadRequest("OTP expired");
+            }
+
+
+            var user = new User
+            {
+                username = request.Username,
+                email = request.Email,
+                password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                IsEmailVerified = true,
+                CreatedAt = DateTime.Now
+            };
+
+
+            _context.Users.Add(user);
+
+
+            verification.IsUsed = true;
+
 
             await _context.SaveChangesAsync();
 
 
             return Ok(new
             {
-                message = "Register successful",
-                userId = newUser.UserId
+                message = "Email verified and registration completed"
             });
         }
         //forgot password
@@ -112,12 +197,9 @@ namespace SelfStudyHub2.API.Controllers
 
 
             // Generate 6 digit OTP
-            Random random = new Random();
-
-            string otp = random.Next(100000, 999999)
-                .ToString();
-
-
+            string otp = RandomNumberGenerator
+     .GetInt32(100000, 999999)
+     .ToString();
 
             // Create password reset record
 
@@ -135,17 +217,22 @@ namespace SelfStudyHub2.API.Controllers
             };
 
 
-
             _context.PasswordResets.Add(reset);
 
             await _context.SaveChangesAsync();
+
+            await _emailService.SendEmailAsync(
+                request.Email,
+                "Password Reset OTP",
+                $"Your OTP Code is: {otp}"
+            );
 
 
 
             return Ok(new
             {
-                message = "OTP generated",
-                otp = otp
+                message = "OTP sent to your email",
+               
             });
         }
         [HttpPost("verify-otp")]
@@ -193,7 +280,9 @@ namespace SelfStudyHub2.API.Controllers
             {
                 return BadRequest("OTP expired");
             }
+            reset.IsVerified = true;
 
+            await _context.SaveChangesAsync();
 
 
             return Ok(new
@@ -206,11 +295,11 @@ namespace SelfStudyHub2.API.Controllers
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {
             if (string.IsNullOrEmpty(request.Email) ||
-                string.IsNullOrEmpty(request.NewPassword))
+     string.IsNullOrEmpty(request.OTP) ||
+     string.IsNullOrEmpty(request.NewPassword))
             {
-                return BadRequest("Email and new password required");
+                return BadRequest("Email OTP and Password required");
             }
-
 
             // Find user
             var user = await _context.Users
@@ -226,10 +315,12 @@ namespace SelfStudyHub2.API.Controllers
 
             // Find verified OTP
             var reset = await _context.PasswordResets
-                .Where(x =>
-                    x.UserId == user.UserId &&
-                    x.IsUsed == false)
-                .OrderByDescending(x => x.CreatedDate)
+     .Where(x =>
+    x.UserId == user.UserId &&
+    x.OTP == request.OTP &&
+    x.IsUsed == false &&
+    x.IsVerified == true)
+                 .OrderByDescending(x => x.CreatedDate)
                 .FirstOrDefaultAsync();
 
 
@@ -242,17 +333,16 @@ namespace SelfStudyHub2.API.Controllers
 
 
             // Update password
-            user.password = request.NewPassword;
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
 
+            Console.WriteLine("New Password: " + request.NewPassword);
+            Console.WriteLine("Hash: " + hashedPassword);
 
+            user.password = hashedPassword;
 
-            // Mark OTP as used
             reset.IsUsed = true;
 
-
-
             await _context.SaveChangesAsync();
-
 
 
             return Ok(new
@@ -262,7 +352,12 @@ namespace SelfStudyHub2.API.Controllers
         }
     }
 
-
+    public class ResetPasswordRequest
+    {
+        public string? Email { get; set; }
+        public string? OTP { get; set; }
+        public string? NewPassword { get; set; }
+    }
     public class LoginRequest
     {
         public string? Email { get; set; }
