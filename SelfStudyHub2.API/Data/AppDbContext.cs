@@ -10,15 +10,17 @@ namespace SelfStudyHub2.API.Data
         {
 
         }
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; } = null!;
 
-        public DbSet<PasswordReset> PasswordResets { get; set; }
+        public DbSet<Note> Notes { get; set; } = null!;
 
-        public DbSet<Note> Notes { get; set; }
+        public DbSet<RecentVideo> RecentYTVideos { get; set; } = null!;
 
-        public DbSet<RecentVideo> RecentYTVideos { get; set; }
+        public DbSet<RecentPDF> RecentPDFs { get; set; } = null!;
 
-        public DbSet<RecentPDF> RecentPDFs { get; set; }
+        public DbSet<EmailVerification> EmailVerifications { get; set; } = null!;
+
+        public DbSet<PasswordReset> PasswordResets { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RecentVideo>()
@@ -43,6 +45,9 @@ namespace SelfStudyHub2.API.Data
                 .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(x => x.UserId);
+
+            modelBuilder.Entity<EmailVerification>()
+    .ToTable("EmailVerification_tb");
 
         }
 
