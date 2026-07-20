@@ -1,0 +1,34 @@
+﻿<Window x:Class="self_studyhub.VerifyOTPWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:self_studyhub"
+        mc:Ignorable="d"
+        Title="Verify OTP" Height="350" Width="400">
+    <Grid>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+
+
+            <TextBlock Text="Email Verification"
+                       FontSize="24"
+                       HorizontalAlignment="Center"/>
+
+
+            <TextBox x:Name="txtOTP"
+                     Width="250"
+                     Height="40"
+                     Margin="10"
+                     ToolTip="Enter OTP"/>
+
+
+            <Button Content="Verify"
+                    Width="150"
+                    Height="40"
+                    Click="Verify_Click"/>
+
+
+        </StackPanel>
+    </Grid>
+</Window>

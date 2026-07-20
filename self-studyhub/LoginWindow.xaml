@@ -73,48 +73,49 @@
 
                     <!-- PasswordBox -->
                     <PasswordBox x:Name="txtPassword"
-                    Grid.Column="0"
                  FontSize="16"
                  FontWeight="SemiBold"
                  
+                 Height="45"
+                 VerticalAlignment="Center"
                  Background="Transparent"
-                 Padding="13,0,0,0"
                  materialDesign:HintAssist.Hint="Password"
-               
-                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
+                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                 Padding="12,8,45,8"/>
 
 
                     <!-- Visible Password -->
                     <TextBox x:Name="txtPasswordVisible"
-                    Grid.Column="0"
              FontSize="16"
              FontWeight="SemiBold"
-             Foreground="White"
-             Background="#3A8FA0"
-             Padding="13,0,0,0"
-         
+             Height="45"
+             Padding="12,8,45,8"
+             VerticalAlignment="Center"
+             Foreground="Black"
+             Background="Transparent"
              materialDesign:HintAssist.Hint="Password"
              Style="{StaticResource MaterialDesignOutlinedTextBox}"
              Visibility="Collapsed"/>
 
-                    <!-- Eye Button (Overlay) -->
-                    <Button HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Grid.Column="1"
-            Background="Transparent"
-            BorderThickness="0"
-            Click="TogglePassword_Click"
-            Cursor="Hand"
-            Panel.ZIndex="1">
 
+                    <!-- Eye Icon Inside Box -->
+                    <Button HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Width="40"
+        Height="40"
+        Background="Transparent"
+        BorderThickness="0"
+        Padding="0"
+        Focusable="False"
+        IsTabStop="False"
+        Click="TogglePassword_Click"
+        Cursor="Hand">
                         <materialDesign:PackIcon x:Name="eyeIcon"
                                  Kind="EyeOutline"
-                                 Width="20"
-                                 Height="20"
-                                 Foreground="White"
-                                 VerticalAlignment="Center"
-                                 HorizontalAlignment="Center"
-                                 Padding="13,0,0,0"/>
+                                 Width="22"
+                                 Height="22"
+                                 Foreground="Black"/>
+
                     </Button>
 
                 </Grid>
@@ -127,7 +128,7 @@
                         Background="#0F1E5A"
                         Foreground="White"
                         FontWeight="Bold"
-                       Style="{StaticResource MaterialDesignRaisedButton}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
                         materialDesign:ButtonAssist.CornerRadius="15"/>
 
                 <Button Content=" Create an account"

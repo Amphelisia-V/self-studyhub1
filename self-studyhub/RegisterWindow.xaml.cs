@@ -29,7 +29,17 @@ namespace self_studyhub
         {
             string username = txtUsername.Text.Trim();
             string email = txtEmail.Text.Trim();
-            string password = txtPassword.Password.Trim();
+            string password;
+
+
+            if (txtPassword.Visibility == Visibility.Visible)
+            {
+                password = txtPassword.Password.Trim();
+            }
+            else
+            {
+                password = txtPasswordVisible.Text.Trim();
+            }
 
             if (username == "" || email == "" || password == "")
             {
@@ -59,10 +69,14 @@ namespace self_studyhub
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Account Created Successfully!");
+                    MessageBox.Show("OTP sent to your email");
 
-                    LoginWindow login = new LoginWindow();
-                    login.Show();
+                    VerifyOTPWindow otpWindow = new VerifyOTPWindow(
+      username,
+      email,
+      password
+  );
+                    otpWindow.Show();
                     this.Close();
                 }
                 else
@@ -88,17 +102,60 @@ namespace self_studyhub
 
         private void TogglePassword_Click(object sender, RoutedEventArgs e)
         {
-            if (isVisible)
+            if (isVisible == false)
             {
-                txtPassword.Visibility = Visibility.Visible;
-                txtPasswordVisible.Visibility = Visibility.Collapsed;
+                // PasswordBox → TextBox
+
+                txtPasswordVisible.Text =
+                    txtPassword.Password;
+
+
+                txtPassword.Visibility =
+                    Visibility.Collapsed;
+
+
+                txtPasswordVisible.Visibility =
+                    Visibility.Visible;
+
+
+                txtPasswordVisible.Focus();
+
+
+                txtPasswordVisible.CaretIndex =
+                    txtPasswordVisible.Text.Length;
+
+
+                eyeIcon.Kind =
+                    MaterialDesignThemes.Wpf.PackIconKind.EyeOffOutline;
+
+
+                isVisible = true;
             }
             else
             {
-                txtPassword.Visibility = Visibility.Collapsed;
-                txtPasswordVisible.Visibility = Visibility.Visible;
+                // TextBox → PasswordBox
+
+                txtPassword.Password =
+                    txtPasswordVisible.Text;
+
+
+                txtPasswordVisible.Visibility =
+                    Visibility.Collapsed;
+
+
+                txtPassword.Visibility =
+                    Visibility.Visible;
+
+
+                txtPassword.Focus();
+
+
+                eyeIcon.Kind =
+                    MaterialDesignThemes.Wpf.PackIconKind.EyeOutline;
+
+
+                isVisible = false;
             }
-            isVisible = !isVisible; // toggle
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

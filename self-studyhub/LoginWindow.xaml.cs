@@ -35,7 +35,12 @@ namespace self_studyhub
 
             if (email == "" || password == "")
             {
-                MessageBox.Show("Please enter username and password", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+        "Please enter your email and password.",
+        "Validation",
+        MessageBoxButton.OK,
+        MessageBoxImage.Warning
+    );
                 return;
             }
 
@@ -83,9 +88,11 @@ namespace self_studyhub
                 }
                 else
                 {
+                    string error = await response.Content.ReadAsStringAsync();
+
                     MessageBox.Show(
-                        "Email or Password Incorrect!",
-                        "Error",
+                        error,
+                        "Login Failed",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning
                     );
@@ -97,23 +104,29 @@ namespace self_studyhub
                 MessageBox.Show("Error: " + ex.Message);
             }
            }
-
+        private int passwordCaretPosition = 0;
         private void TogglePassword_Click(object sender, RoutedEventArgs e)
         {
             if (txtPassword.Visibility == Visibility.Visible)
             {
+                // Save cursor position
+                passwordCaretPosition = txtPassword.Password.Length;
+
                 txtPasswordVisible.Text = txtPassword.Password;
 
                 txtPassword.Visibility = Visibility.Collapsed;
                 txtPasswordVisible.Visibility = Visibility.Visible;
 
                 txtPasswordVisible.Focus();
-                txtPasswordVisible.CaretIndex = txtPasswordVisible.Text.Length;
+                txtPasswordVisible.CaretIndex = passwordCaretPosition;
 
                 eyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOffOutline;
             }
             else
             {
+                // Save visible textbox cursor
+                passwordCaretPosition = txtPasswordVisible.CaretIndex;
+
                 txtPassword.Password = txtPasswordVisible.Text;
 
                 txtPasswordVisible.Visibility = Visibility.Collapsed;

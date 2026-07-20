@@ -137,17 +137,17 @@ FontWeight="SemiBold"
              Visibility="Collapsed"/>
 
                             <Button Grid.Column="1"
-            Background="Transparent"
-            BorderThickness="0"
-            Click="TogglePassword_Click">
+        Background="Transparent"
+        BorderThickness="0"
+        Click="TogglePassword_Click">
 
                                 <materialDesign:PackIcon x:Name="eyeIcon"
-                                 Kind="EyeOutline"
-                                 Width="18"
-                                 Height="18"
-                                 Foreground="Black"
-                                 VerticalAlignment="Center"
-                                 HorizontalAlignment="Center"/>
+                             Kind="EyeOutline"
+                             Width="15"
+                             Height="15"
+                             Foreground="Black"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"/>
                             </Button>
                         </Grid>
                     </Border>

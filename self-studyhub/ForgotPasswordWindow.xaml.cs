@@ -27,8 +27,7 @@ namespace self_studyhub
         private readonly HttpClient client = new HttpClient();
 
         private string userEmail = "";
-        private string secretAnswerHash;
-        private int userId;
+        private string userOTP = "";
         public ForgotPasswordWindow()
         {
             InitializeComponent();
@@ -49,6 +48,7 @@ namespace self_studyhub
             var data = new
             {
                 email = email,
+                otp = userOTP,
                 newPassword = password
             };
 
@@ -156,12 +156,7 @@ namespace self_studyhub
 
                 dynamic otpResult = JsonConvert.DeserializeObject(result);
 
-                MessageBox.Show(
-                    "Your OTP is: " + otpResult.otp,
-                    "OTP"
-                );
-
-
+               
                 Step1.Visibility = Visibility.Collapsed;
                 Step2.Visibility = Visibility.Visible;
             }
@@ -209,6 +204,7 @@ namespace self_studyhub
 
                 if (response.IsSuccessStatusCode)
                 {
+                    userOTP = otp;
                     MessageBox.Show("OTP verified");
 
 
